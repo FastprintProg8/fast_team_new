@@ -6,14 +6,18 @@ import 'package:Fast_Team/model/account_information_model.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:path/path.dart' as path;
 
 class PayslipPage extends StatefulWidget {
   const PayslipPage({super.key});
@@ -25,6 +29,8 @@ class PayslipPage extends StatefulWidget {
 class _PayslipPageState extends State<PayslipPage> {
   var nama;
   var posisi;
+  var divisi;
+  var id_account;
   var imgUrl;
   var basic_salary = 0;
   var net_salary = 0;
@@ -70,6 +76,7 @@ class _PayslipPageState extends State<PayslipPage> {
     AccountController accountController = Get.put(AccountController());
     String formattedDate = formatDate(_selectedDate);
     var result = await accountController.retriveAccountInformation();
+
     AccountInformationModel accountModel =
         AccountInformationModel.fromJson(result['details']['data']);
     PayrollController payrollController = Get.put(PayrollController());
@@ -77,16 +84,17 @@ class _PayslipPageState extends State<PayslipPage> {
     var salaryDetail = await payrollController
         .retriveDetailPayroll(salaryResult['details']['id']);
     setState(() {
+      id_account = accountModel.id;
       nama = accountModel.fullName;
       posisi = accountModel.posisiPekerjaan;
+      divisi = accountModel.divisi;
       imgUrl = accountModel.imgProfUrl;
       basic_salary = salaryResult['details']['basic_salary'];
       net_salary = salaryResult['details']['take_home_pay'];
       detail_payroll = salaryDetail['details'];
       deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
-      allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance')+basic_salary;
+      allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
     });
-    // print(allowance + basic_salary);
   }
 
   int calculateTotalDeductionAmount(List<dynamic> data, type) {
@@ -120,7 +128,6 @@ class _PayslipPageState extends State<PayslipPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
-          print(date);
         });
         // await _loadDataForSelectedMonth();
       }
@@ -129,21 +136,143 @@ class _PayslipPageState extends State<PayslipPage> {
 
   Future<void> createPDF() async {
     final pdf = pw.Document();
+    final img = await rootBundle.load('assets/img/logoFP.png');
+    final imageBytes = img.buffer.asUint8List();
 
+    List<List<String>> tableData = [
+      ['No', 'Nama', 'Usia'],
+      ['1', 'John Doe', '30'],
+      ['2', 'Jane Doe', '25'],
+      ['3', 'Alice', '35'],
+    ];
+    pw.Table table = pw.Table(
+      border: pw.TableBorder.all(),
+      children: [
+        // Baris header
+        pw.TableRow(
+          children: tableData.first
+              .map((title) => pw.Container(
+                    alignment: pw.Alignment.center,
+                    child: pw.Text(title,
+                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
+                    padding: pw.EdgeInsets.all(8),
+                  ))
+              .toList(),
+        ),
+        // Data
+        ...tableData
+            .skip(1)
+            .map((row) => pw.TableRow(
+                  children: row
+                      .map((cell) => pw.Container(
+                            alignment: pw.Alignment.center,
+                            child: pw.Text(cell),
+                            padding: pw.EdgeInsets.all(8),
+                          ))
+                      .toList(),
+                ))
+            .toList(),
+      ],
+    );
+    pw.Image image1 = pw.Image(pw.MemoryImage(imageBytes));
     pdf.addPage(pw.Page(
       build: (pw.Context context) {
-        return pw.Center(
-          child: pw.Text("Hello World", style: pw.TextStyle(fontSize: 40)),
-        ); // Misalnya, ini merupakan tampilan yang akan disertakan di PDF
+        return pw.Container(
+          child: pw.Column(children: [
+            pw.Container(
+              height: 80.w,
+              child: image1,
+            ),
+            pw.Container(
+              padding: pw.EdgeInsets.only(top: 50.w, bottom: 20.w),
+              child: pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                children: [
+                  pw.Text(
+                    'Fast Print Indonesia',
+                    style: pw.TextStyle(
+                      color: PdfColor.fromInt(0xff000000),
+                      fontSize: 12.sp,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                  pw.Text(
+                    'PAYSLIP',
+                    style: pw.TextStyle(
+                      color: PdfColor.fromInt(0xff000000),
+                      fontSize: 12.sp,
+                      fontWeight: pw.FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            pw.Row(
+              children: [
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text('Payroll Date'),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text('Name'),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text('Job Position'),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text('Organization'),
+                    ),
+                  ],
+                ),
+                pw.SizedBox(width: 18.w),
+                pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text(': ${formatDate(_selectedDate)}'),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text(': ${nama}'),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text(': ${posisi}'),
+                    ),
+                    pw.Container(
+                      padding: pw.EdgeInsets.only(bottom: 6.h),
+                      child: pw.Text(': ${divisi}'),
+                    ),
+                  ],
+                ),
+                pw.Padding(
+                  padding: pw.EdgeInsets.symmetric(vertical: 20),
+                  child: table,
+                ),
+              ],
+            ),
+          ]),
+        );
       },
     ));
 
-    final Directory? documentDirectory =
-        await getApplicationDocumentsDirectory();
+    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
 
-    print(documentDirectory?.path);
-    // final file = File("${directory.path}/example.pdf");
-    // await file.writeAsBytes(await pdf.save());
+    // if (dpath != null) {
+    //   var p = path.join(dpath, 'test.jpg');
+    //   print('save path:  $p'); // save path: /storage/emulated/0/.Android/test.jpg
+    // }
+
+    //   print('test');
+    final file = File("${selectedDirectory}/example.pdf");
+    await file.writeAsBytes(await pdf.save());
   }
 
   @override
@@ -281,6 +410,7 @@ class _PayslipPageState extends State<PayslipPage> {
   Widget _salarySlipCard(BuildContext context) {
     return Card(
       child: ExpansionTile(
+        initiallyExpanded: true,
         title: Text("Salary Slip"),
         children: [
           Container(
@@ -297,20 +427,32 @@ class _PayslipPageState extends State<PayslipPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Allowance",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: ColorsTheme.lightGrey,
-                            ),
-                          ),
-                          Text(
                             "Basic Salary",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          if (detail_payroll.isEmpty) // Cek apakah data kosong
-                            Text("") // Jika kosong, kembalikan Text kosong
+                          Padding(
+                            padding: EdgeInsets.only(top: 10.h),
+                            child: Text(
+                              "Allowance",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: ColorsTheme.lightGrey,
+                              ),
+                            ),
+                          ),
+                          if (detail_payroll.isEmpty)
+                            Text("")
+                          else if (detail_payroll
+                              .where((item) => item["type"] == "allowance")
+                              .isEmpty)
+                            Text(
+                              "-",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           else
                             ...detail_payroll
                                 .where((item) => item["type"] == "allowance")
@@ -344,6 +486,15 @@ class _PayslipPageState extends State<PayslipPage> {
                           ),
                           if (detail_payroll.isEmpty) // Cek apakah data kosong
                             Text("") // Jika kosong, kembalikan Text kosong
+                          else if (detail_payroll
+                              .where((item) => item["type"] == "deduction")
+                              .isEmpty)
+                            Text(
+                              "-",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           else
                             ...detail_payroll
                                 .where((item) => item["type"] == "deduction")
@@ -367,15 +518,24 @@ class _PayslipPageState extends State<PayslipPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(""),
                           Text(
                             "Rp ${formatCurrency(basic_salary)}",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
                           ),
+                          Text(""),
                           if (detail_payroll.isEmpty) // Cek apakah data kosong
                             Text("") // Jika kosong, kembalikan Text kosong
+                          else if (detail_payroll
+                              .where((item) => item["type"] == "allowance")
+                              .isEmpty)
+                            Text(
+                              "-",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           else
                             ...detail_payroll
                                 .where((item) => item["type"] == "allowance")
@@ -392,6 +552,15 @@ class _PayslipPageState extends State<PayslipPage> {
                           Text(""),
                           if (detail_payroll.isEmpty) // Cek apakah data kosong
                             Text("") // Jika kosong, kembalikan Text kosong
+                          else if (detail_payroll
+                              .where((item) => item["type"] == "deduction")
+                              .isEmpty)
+                            Text(
+                              "-",
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
+                            )
                           else
                             ...detail_payroll
                                 .where((item) => item["type"] == "deduction")
@@ -411,12 +580,19 @@ class _PayslipPageState extends State<PayslipPage> {
                   ),
                   SizedBox(height: 10.w),
                   Divider(),
-                   SizedBox(height: 10.w),
+                  SizedBox(height: 10.w),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            "Total Basic Salary",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Text(
                             "Total Allowance",
                             style: TextStyle(
@@ -432,7 +608,14 @@ class _PayslipPageState extends State<PayslipPage> {
                         ],
                       ),
                       Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            "Rp ${formatCurrency(basic_salary)}",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                           Text(
                             "Rp ${formatCurrency(allowance)}",
                             style: TextStyle(
@@ -460,8 +643,22 @@ class _PayslipPageState extends State<PayslipPage> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Total Net Pay"),
-                  Text("Rp ${formatCurrency(net_salary)}"),
+                  Text(
+                    "Take Home Pay",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Text(
+                    "Rp ${formatCurrency(net_salary)}",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ]),
           ),
         ],

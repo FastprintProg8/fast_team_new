@@ -89,7 +89,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     fullname = accountModel.fullName;
     divisiName.value = accountModel.divisi;
     jenisKelamin.value = accountModel.gender;
-    tempatLahir.value = accountModel.tanggalLahir;
+    tempatLahir.value = accountModel.tempatLahir;
     tanggalLahir.value = accountModel.tanggalLahir;
     noHp.value = accountModel.nomorHp;
     statusPerinkahan.value = accountModel.statusKawin;
