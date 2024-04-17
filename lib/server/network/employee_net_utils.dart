@@ -2,10 +2,19 @@ import 'package:Fast_Team/server/base_server.dart';
 import 'package:http/http.dart' as http;
 
 class EmployeeNetUtils {
-  retriveListEmployee() async {
+  retriveListEmployee(token) async {
     var path = "${BaseServer.serverUrl}/api_absensi/divisi/";
-    var response =
-        await http.get(Uri.parse(path)).timeout(BaseServer.durationlimit);
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+
+    var response = await http.get(Uri.parse(path), headers: {
+      "Accept": "*/*",
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token"
+    }).timeout(BaseServer.durationlimit);
     return response;
   }
 
@@ -18,11 +27,15 @@ class EmployeeNetUtils {
     return response;
   }
 
-  retrieveEmployeeList() async {
-    var response = await http
-        .get(Uri.parse(
-            "${BaseServer.serverUrl}/api_absensi/user-absen/"))
-        .timeout(BaseServer.durationlimit);
+  retrieveEmployeeList(token) async {
+    Map<String, String> headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer $token',
+  };
+  print(headers);
+    var response = await http.get(
+        Uri.parse("${BaseServer.serverUrl}/api_absensi/user-absen/"),
+        headers: headers).timeout(BaseServer.durationlimit);
 
     return response;
   }

@@ -16,19 +16,19 @@ class InboxController {
 
     return ResponseHelper().jsonResponse(result);
   }
-  
+
   retrieveLeaveList(userId) async {
     var result = await inboxNetUtils.retrieveLeaveList(userId);
 
     return ResponseHelper().jsonResponse(result);
   }
-  
+
   retrieveNotificationList(userId) async {
     var result = await inboxNetUtils.retrieveNotificationList(userId);
 
     return ResponseHelper().jsonResponse(result);
   }
-  
+
   retrieveNotificationDetail(notifId) async {
     var result = await inboxNetUtils.retrieveNotificationDetail(notifId);
 
@@ -40,5 +40,4 @@ class InboxController {
 
     return ResponseHelper().jsonResponse(result);
   }
-
 }

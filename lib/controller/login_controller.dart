@@ -50,6 +50,10 @@ class LoginController extends GetxController {
     await localSession.storeUserInfo(jsonData);
   }
 
+  storeToken(jsonData) async {
+    await localSession.storeUserToken(jsonData);
+  }
+
   storeEmployeeInfo(jsonData) async {
     await localSession.storeEmployeeInfo(jsonData);
   }

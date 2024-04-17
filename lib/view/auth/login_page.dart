@@ -164,21 +164,23 @@ class _LoginPageState extends State<LoginPage> {
     requestLogin() async {
       var userResult = await controller.requestLoginUser(
           emailInput.text, passwordInput.text);
-
+      // print(userResult);
       if (userResult['status'] == 200) {
         if (userResult['details']['status'] == "success") {
           controller.storeUserInfo(userResult['details']['data']);
           controller.storeJsonUser(userResult['details']['data']);
+          controller.storeToken(userResult['details']['token']);
           var employeeResult = await controller.retrieveEmployeeInfo(
-              userResult['details']['data']['id_user'] ?? 0);
-
+              userResult['details']['data']['empoloyee_id'] ?? 0);
+          // print(employeeResult);
           if (employeeResult['status'] == 200) {
-            // controller.storeEmployeeInfo(employeeResult['details']);
+            controller.storeEmployeeInfo(employeeResult['details']['data']);
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
                 builder: (BuildContext context) => NavigatorBottomMenu(),
               ),
             );
+            // showSnackBar('berhasil');
           } else {
             showSnackBar('Server dalam gangguan');
           }

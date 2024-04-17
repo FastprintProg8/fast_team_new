@@ -74,7 +74,6 @@ class _MapPageState extends State<MapPage> {
   Future<void> _getCurrentLocation() async {
     Position position = await Geolocator.getCurrentPosition();
     AbsentController absentController = Get.put(AbsentController());
-
     double latitude = position.latitude;
     double longitude = position.longitude;
 

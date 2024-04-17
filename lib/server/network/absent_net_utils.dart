@@ -6,46 +6,70 @@ import 'package:Fast_Team/server/base_server.dart';
 import 'package:http/http.dart' as http;
 
 class AbsentNetUtils {
-  retriveTotalData(userId, date) async {
+  retriveTotalData(token, userId, date) async {
     var path =
         "${BaseServer.serverUrl}/api_absensi/log-absen/detail-total/$userId/$date/";
-
-    var response =
-        await http.get(Uri.parse(path)).timeout(BaseServer.durationlimit);
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    var response = await http
+        .get(Uri.parse(path), headers: headers)
+        .timeout(BaseServer.durationlimit);
 
     return response;
   }
 
-  retriveAbsentData(userId, date) async {
+  retriveAbsentData(token, userId, date) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
     var path = "${BaseServer.serverUrl}/api_absensi/log-absen/$userId/$date/";
 
-    var response =
-        await http.get(Uri.parse(path)).timeout(BaseServer.durationlimit);
+    var response = await http
+        .get(Uri.parse(path), headers: headers)
+        .timeout(BaseServer.durationlimit);
 
     return response;
   }
 
-  retriveDetailAbsensi(userId) async {
+  retriveDetailAbsensi(token, userId) async {
     var path = "${BaseServer.serverUrl}/api_absensi/log-absen/detail/$userId/";
-
-    var response =
-        await http.get(Uri.parse(path)).timeout(BaseServer.durationlimit);
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    var response = await http
+        .get(Uri.parse(path), headers: headers)
+        .timeout(BaseServer.durationlimit);
 
     return response;
   }
 
-  retriveUserAbsenOnly() async {
+  retriveUserAbsenOnly(token) async {
     var path = '${BaseServer.serverUrl}/api_absensi/user-absen/';
-    var response =
-        await http.get(Uri.parse(path)).timeout(BaseServer.durationlimit);
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    var response = await http
+        .get(Uri.parse(path), headers: headers)
+        .timeout(BaseServer.durationlimit);
     // print("ini response $response");
     return response;
   }
 
-  retriveUserAbsenDateDevisi(tanggal, idDivisi) async {
+  retriveUserAbsenDateDevisi(token, tanggal, idDivisi) async {
     var path =
         '${BaseServer.serverUrl}/api_absensi/user-absen/${tanggal}/${idDivisi}';
-    var response = http.get(Uri.parse(path)).timeout(BaseServer.durationlimit);
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    var response = http
+        .get(Uri.parse(path), headers: headers)
+        .timeout(BaseServer.durationlimit);
     return response;
   }
 }

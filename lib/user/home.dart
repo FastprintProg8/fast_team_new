@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:Fast_Team/user/controllerApi.dart';
@@ -79,6 +80,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     permission = await Geolocator.checkPermission();
+    print(permission);
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse &&
@@ -92,6 +94,18 @@ class _HomePageState extends State<HomePage> {
       lat = position.latitude;
       long = position.longitude;
     });
+  }
+
+  Future<void> requestLocationPermission(BuildContext context) async {
+    LocationPermission permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      // Izin ditolak, tampilkan pesan atau ambil tindakan lain sesuai kebutuhan
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Izin lokasi ditolak oleh pengguna.'),
+        ),
+      );
+    }
   }
 
   Future<void> loadSharedPreferences() async {
@@ -172,12 +186,38 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _clockIn() {
-    Navigator.pushNamed(context, '/map', arguments: 'in');
+  void _clockIn(BuildContext context) async {
+    LocationPermission permission = await Geolocator.requestPermission();
+
+    // Periksa status izin lokasi
+    if (permission == LocationPermission.denied) {
+      // Izin ditolak, tampilkan Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Izin lokasi ditolak oleh pengguna.'),
+        ),
+      );
+    } else {
+      // Izin diberikan, navigasi ke halaman '/map'
+      Navigator.pushNamed(context, '/map', arguments: 'in');
+    }
   }
 
-  void _clockOut() {
-    Navigator.pushNamed(context, '/map', arguments: 'out');
+  void _clockOut(BuildContext context) async{
+    LocationPermission permission = await Geolocator.requestPermission();
+    print('permission');
+    // Periksa status izin lokasi
+    if (permission == LocationPermission.denied) {
+      // Izin ditolak, tampilkan Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Izin lokasi ditolak oleh pengguna.'),
+        ),
+      );
+    } else {
+      // Izin diberikan, navigasi ke halaman '/map'
+     Navigator.pushNamed(context, '/map', arguments: 'out');
+    }
   }
 
   String getGreeting() {
@@ -354,7 +394,7 @@ class _HomePageState extends State<HomePage> {
                                     MainAxisAlignment.spaceAround,
                                 children: [
                                   ElevatedButton(
-                                    onPressed: canClockIn ? _clockIn : null,
+                                    onPressed: canClockIn ? () => _clockIn(context) : null,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: canClockIn
                                           ? Color.fromARGB(255, 2, 65, 128)
@@ -368,7 +408,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
                                   ElevatedButton(
-                                    onPressed: canClockOut ? _clockOut : null,
+                                    onPressed: canClockOut ? () => _clockOut(context) : null,
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: canClockOut
                                           ? Color.fromARGB(255, 2, 65, 128)

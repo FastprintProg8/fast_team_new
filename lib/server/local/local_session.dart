@@ -11,7 +11,15 @@ class LocalSession {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jsonString =
         json.encode(jsonData); // Convert the map to a JSON string
+    // print(jsonString);
     prefs.setString('jsonUser', jsonString);
+  }
+
+  storeUserToken(jsonData) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = json.encode(jsonData).replaceAll('"', '');
+    prefs.setString('token', token);
+    
   }
 
   storeUserInfo(jsonData) async {
@@ -44,6 +52,7 @@ class LocalSession {
   storeEmployeeInfo(jsonData) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String jsonString = json.encode(jsonData);
+    // print(jsonData['divisi']['name']);
     prefs.setString('jsonEmployeeInfo', jsonString);
     await prefs.setString(
         'emp-full_name', "${jsonData['nama_awal']} ${jsonData['nama_akhir']}");

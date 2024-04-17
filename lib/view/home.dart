@@ -352,12 +352,38 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _clockIn() {
-    Navigator.pushNamed(context, '/map', arguments: 'in');
+  void _clockIn(BuildContext context) async {
+    LocationPermission permission = await Geolocator.requestPermission();
+
+    // Periksa status izin lokasi
+    if (permission == LocationPermission.denied) {
+      // Izin ditolak, tampilkan Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Izin lokasi ditolak oleh pengguna.'),
+        ),
+      );
+    } else {
+      // Izin diberikan, navigasi ke halaman '/map'
+      Navigator.pushNamed(context, '/map', arguments: 'in');
+    }
   }
 
-  void _clockOut() {
-    Navigator.pushNamed(context, '/map', arguments: 'out');
+  void _clockOut(BuildContext context) async{
+    LocationPermission permission = await Geolocator.requestPermission();
+    print('permission');
+    // Periksa status izin lokasi
+    if (permission == LocationPermission.denied) {
+      // Izin ditolak, tampilkan Snackbar
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Izin lokasi ditolak oleh pengguna.'),
+        ),
+      );
+    } else {
+      // Izin diberikan, navigasi ke halaman '/map'
+     Navigator.pushNamed(context, '/map', arguments: 'out');
+    }
   }
 
   String getGreeting() {
@@ -480,7 +506,7 @@ class _HomePageState extends State<HomePage> {
       Widget absnetButton(name, status, clockIn, loading) => (loading)
           ? absnetButtonLoading()
           : ElevatedButton(
-              onPressed: status ? (clockIn ? _clockIn : _clockOut) : null,
+              onPressed: status ? (clockIn ? () => _clockIn(context) : () => _clockOut(context)) : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor: status ? Color.fromARGB(255, 2, 65, 128) : Colors.grey,
               ),

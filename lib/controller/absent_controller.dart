@@ -32,10 +32,12 @@ class AbsentController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     var userId = prefs.getInt('user-id_user');
+    var token = prefs.getString('token');
+
     var date =
         "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}";
 
-    var totalData = await absentNetUtils.retriveTotalData(userId, date);
+    var totalData = await absentNetUtils.retriveTotalData(token, userId, date);
     return ResponseHelper().jsonResponse(totalData);
   }
 
@@ -43,9 +45,11 @@ class AbsentController extends GetxController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     var userId = prefs.getInt('user-id_user');
+    var token = prefs.getString('token');
     var date =
         "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}";
-    var absentData = await absentNetUtils.retriveAbsentData(userId, date);
+    var absentData =
+        await absentNetUtils.retriveAbsentData(token, userId, date);
     var result = ResponseHelper().jsonResponse(absentData);
 
     if (result['status'] == 200) {
@@ -100,12 +104,13 @@ class AbsentController extends GetxController {
     } else {
       throw Exception('Failed to load data');
     }
-    
   }
-  retriveDetailAbsenst(userId)async{
 
-    var detailAbsenst = await absentNetUtils.retriveDetailAbsensi(userId);
+  retriveDetailAbsenst(userId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var detailAbsenst =
+        await absentNetUtils.retriveDetailAbsensi(token, userId);
     return ResponseHelper().jsonResponse(detailAbsenst);
-  
   }
 }
