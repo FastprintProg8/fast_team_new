@@ -101,6 +101,8 @@ class AccountInformationModel {
       alamatTinggal: json['alamat_tinggal'],
       cabang: json['cabang']['name'],
       id_level: json['level_pekerjaan']['id'],
+      bank: json['bank']['name'],
+      nomorRekening: json['nomor_rekening'],
       shift:
           "${DateFormat.Hm().format(shiftIn)} - ${DateFormat.Hm().format(shiftOut)}",
       masukAkhir: json['clock_in']['max'],

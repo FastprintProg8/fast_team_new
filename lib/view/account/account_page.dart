@@ -6,6 +6,7 @@ import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/view/account/personal_info_page.dart';
 import 'package:Fast_Team/view/auth/login_page.dart';
 import 'package:Fast_Team/view/auth/reset_password_page.dart';
+import 'package:Fast_Team/view/payroll_info/payroll_info_page.dart';
 import 'package:Fast_Team/view/sertificate.dart';
 
 import 'package:Fast_Team/widget/refresh_widget.dart';
@@ -179,7 +180,12 @@ class _AccountPageState extends State<AccountPage> {
             }),
             Divider(),
             menuItems(
-                'Payroll Info', Colors.green, Icons.monetization_on, () {}),
+                'Payroll Info', Colors.green, Icons.monetization_on, () {Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => PayrollInfo(),
+                ),
+              );}),
             Divider(),
             menuItems('Change Password', Colors.orange, Icons.lock, () {
               Navigator.push(
