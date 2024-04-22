@@ -114,6 +114,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     aksi = ModalRoute.of(context)!.settings.arguments as String;
+    
     return Scaffold(
       appBar: AppBar(
         title: Text(

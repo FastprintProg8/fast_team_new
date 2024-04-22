@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 class PayrollNetUtils {
-  requestPayroll(userId, date) async {
+  requestPayroll(token, userId, date) async {
     var path = "${BaseServer.serverUrl}/api_absensi/header-slip-gaji/";
     var id = userId;
     Map<String, dynamic> bodyParams = {
@@ -16,13 +16,14 @@ class PayrollNetUtils {
       Uri.parse(path),
       body: body,
       headers: {
-        'Content-Type': 'application/json',
+        "content-type": "application/json",
+        "Authorization": "Bearer $token",
       },
     );
     return response;
   }
 
-  requestDetailPayroll(payroll_id) async {
+  requestDetailPayroll(token, payroll_id) async {
     var path = "${BaseServer.serverUrl}/api_absensi/detail-slip-gaji/";
     Map<String, dynamic> bodyParams = {
       "payroll_id": '${payroll_id}',
@@ -32,9 +33,28 @@ class PayrollNetUtils {
       Uri.parse(path),
       body: body,
       headers: {
-        'Content-Type': 'application/json',
+        "content-type": "application/json",
+        "Authorization": "Bearer $token",
       },
     );
+    return response;
+  }
+  requestLinkDownloadPayslip(token, payroll_id) async{
+    var path = "${BaseServer.serverUrl}/api_absensi/generate-slip-gaji/";
+    Map<String, dynamic> bodyParams = {
+      "payroll_id": '${payroll_id}',
+    };
+    var body = json.encode(bodyParams);
+
+    var response = await http.post(
+      Uri.parse(path),
+      body: body,
+      headers: {
+        "content-type": "application/json",
+        "Authorization": "Bearer $token",
+      },
+    );
+    
     return response;
   }
 }

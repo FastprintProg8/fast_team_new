@@ -15,7 +15,6 @@ class HomeController extends GetxController {
   retriveListEmployee() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    print(token);
     var result = await employeeNetUtils.retriveListEmployee(token);
     return ResponseHelper().jsonResponse(result);
   }

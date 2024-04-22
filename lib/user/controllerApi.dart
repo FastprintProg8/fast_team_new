@@ -22,7 +22,7 @@ class LoginUser {
       final dataBody = json.decode(response.body);
       if (dataBody['status'] == 'success') {
         final data = dataBody['data'];
-        print(data);
+        
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setInt('user-id_user', data['id_user']);
         await prefs.setInt('user-id_divisi', data['divisi_id']);
@@ -73,7 +73,7 @@ Future<List<Map<String, dynamic>>> getListBelumAbsen(
   } else {
     api_url = '${globalVariable.baseUrl}/user-absen/';
   }
-  print(api_url);
+
   final response = await http.get(Uri.parse(api_url));
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
@@ -104,7 +104,7 @@ Future<List<Map<String, dynamic>>> getLogAbsenSkrg(int idDivisi) async {
   );
   if (response.statusCode == 200) {
     final data = json.decode(response.body);
-    print(data['data']);
+  
     return List<Map<String, dynamic>>.from(data['data']);
   } else {
     throw Exception('Failed to load data from API');

@@ -81,6 +81,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
     'gif': Colors.purple,
   };
 
+  // List<Map<String, dynamic>> listBank = [];
   List<Map<String, dynamic>> listBank = [
     {'label': 'BCA', 'value': 1},
     {'label': 'Mandiri', 'value': 2},
@@ -135,12 +136,21 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
 
   Future<void> initializeState() async {
     await retriveAccountInformation();
+    // await retriveListBank();
   }
+
+  // retriveListBank()async {
+  //   AccountController accountController = Get.put(AccountController());
+  //   var bank = await accountController.retrieveEmployeeBank();
+  //   setState(() {
+  //     listBank = bank['details'];
+  //   });
+  // }
 
   retriveAccountInformation() async {
     AccountController accountController = Get.put(AccountController());
+
     var result = await accountController.retriveAccountInformation();
-    print(result['details']['data']);
     AccountInformationModel accountModel =
         AccountInformationModel.fromJson(result['details']['data']);
     email = accountModel.email;
@@ -298,6 +308,8 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
         return numberForm();
       case 2:
         return emailForm();
+      case 3:
+        return selectedForm(listJenisKelamin);
       case 5:
         return dateForm(context);
       case 7:
@@ -306,6 +318,8 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
         return selectedForm(listAgama);
       case 12:
         return selectedForm(listBank);
+      case 13:
+        return numberForm();
       default:
         return textForm();
     }
@@ -433,6 +447,22 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
       // initialValue: value,
     );
   }
+
+  // Widget multiTextForm() {
+  //   return TextFormField(
+  //     keyboardType: TextInputType.multiline,
+  //     maxLines: 4,
+  //     decoration: InputDecoration(
+  //       labelText: 'Change To',
+  //       labelStyle: TextStyle(
+  //         color: ColorsTheme.black, // Warna label yang ditetapkan
+  //       ),
+  //       prefixIcon: Icon(Icons.edit),
+  //     ),
+  //     // onChanged: (){},
+  //     // initialValue: value,
+  //   );
+  // }
 
   Widget numberForm() {
     return TextFormField(

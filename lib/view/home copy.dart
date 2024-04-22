@@ -6,7 +6,6 @@ import 'package:Fast_Team/model/account_information_model.dart';
 import 'package:Fast_Team/model/user_model.dart';
 import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:Fast_Team/user/controllerApi.dart';
 import 'package:Fast_Team/widget/header_background_home.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -34,6 +33,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  // Future? _loadData;
+
   late SharedPreferences sharedPreferences;
   var idUser;
   var email;
@@ -102,12 +103,10 @@ class _HomePageState extends State<HomePage> {
   List<Map<String, dynamic>> divisiList = [];
   List<dynamic> ListDataMember = [];
   List<dynamic> ListDataEmployee = [];
-  List<dynamic> memberData = [];
 
   HomeController? homeController;
   final listViewController = ScrollController();
 
-  Future? _loadData;
   @override
   void initState() {
     super.initState();
@@ -121,9 +120,8 @@ class _HomePageState extends State<HomePage> {
         }
       }
     });
-    initConstructor();
-    initData();
     initializeState();
+    initConstructor();
 
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -173,61 +171,9 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> initializeState() async {
-    setState(() {
-      _loadData = loadData();
-    });
-  }
-
-  Future<void> initData() async {
-    AccountController accountController = Get.put(AccountController());
-    var result = await accountController.retriveAccountInformation();
-    AccountInformationModel accountModel =
-        AccountInformationModel.fromJson(result['details']['data']);
-    idUser = accountModel.id;
-    nama = accountModel.fullName;
-    divisi = accountModel.divisi;
-    idDivisi = accountModel.id_divisi;
-    id_level = accountModel.id_level;
-    imgUrl = accountModel.imgProfUrl;
-    kantor = accountModel.cabang;
-    masukAwal = accountModel.masukAwal;
-    masukAkhir = accountModel.masukAkhir;
-    keluarAwal = accountModel.keluarAwal;
-    keluarAkhir = accountModel.keluarAkhir;
-    shift = accountModel.shift;
-
-    if (accountModel.id != null) {
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
-
-  Future refreshItem() async {
-    homeController = Get.put(HomeController());
-    try {
-      // Ambil data divisi
-      var divisiData = await homeController!.listDivisi();
-      ListDataEmployee = ListDataEmployee.sublist(0, 5);
-
-      setState(() {
-        _loadData = loadData();
-        divisiList = List.from(divisiData['details']);
-        moreData = true;
-        startList = 0;
-        endList = 5;
-      });
-
-      setState(() {
-        isLoading = true;
-      });
-    } catch (e) {
-      print(e);
-    }
-  }
-
-  bool canAbsent(clockIn) {
-    tz.initializeTimeZones();
+    await loadData();
+    await initData();
+    
     final indonesia = tz.getLocation("Asia/Jakarta");
     now = tz.TZDateTime.now(indonesia);
     if (masukAwal != null) {
@@ -249,40 +195,85 @@ class _HomePageState extends State<HomePage> {
       keluarAkhirDateTime =
           tz.TZDateTime.parse(indonesia, "$currentDate $keluarAkhir");
     }
-    var result;
-    if (clockIn) {
-      result = masukAwalDateTime != null &&
-          masukAkhirDateTime != null &&
-          now.isAfter(masukAwalDateTime!) &&
-          now.isBefore(masukAkhirDateTime!);
-    } else {
-      result = keluarAwalDateTime != null &&
-          keluarAkhirDateTime != null &&
-          now.isAfter(keluarAwalDateTime!) &&
-          now.isBefore(keluarAkhirDateTime!);
-    }
+    canClockIn = masukAwalDateTime != null &&
+        masukAkhirDateTime != null &&
+        now.isAfter(masukAwalDateTime!) &&
+        now.isBefore(masukAkhirDateTime!);
 
+    canClockOut = keluarAwalDateTime != null &&
+        keluarAkhirDateTime != null &&
+        now.isAfter(keluarAwalDateTime!) &&
+        now.isBefore(keluarAkhirDateTime!);
+  
     
+    // print(ListDataEmployee.length);
+  }
 
-    return result;
+  Future<void> initData() async {
+    AccountController accountController = Get.put(AccountController());
+    var result = await accountController.retriveAccountInformation();
+    AccountInformationModel accountModel =
+        AccountInformationModel.fromJson(result['details']['data']);
+    idUser = accountModel.id;
+    nama = accountModel.fullName;
+    divisi = accountModel.divisi;
+    idDivisi = accountModel.id_divisi;
+    id_level = accountModel.id_level;
+    imgUrl = accountModel.imgProfUrl;
+    kantor = accountModel.cabang;
+    masukAwal = accountModel.masukAwal;
+    masukAkhir = accountModel.masukAkhir;
+    keluarAwal = accountModel.keluarAwal;
+    keluarAkhir = accountModel.keluarAkhir;
+    shift = accountModel.shift;
+
+    // ListDataMember = await _fetchMemberData();
+
+    tz.initializeTimeZones();
+    if (accountModel.id != null) {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future refreshItem() async {
+    homeController = Get.put(HomeController());
+    try {
+      // Ambil data divisi
+      var divisiData = await homeController!.listDivisi();
+      ListDataEmployee = ListDataEmployee.sublist(0, 5);
+
+      setState(() {
+        divisiList = List.from(divisiData['details']);
+        moreData = true;
+        startList = 0;
+        endList = 5;
+      });
+
+      setState(() {
+        isLoading = false;
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> loadData() async {
     homeController = Get.put(HomeController());
     try {
-     
+      // Ambil data divisi
       var divisiData = await homeController!.listDivisi();
       var fetch = await _fetchData();
-      var resultMember = await _fetchMemberData();
-      
+      // print(divisiData);
       setState(() {
         ListDataEmployee = fetch;
         divisiList = List.from(divisiData['details']);
         moreData = true;
       });
+
       setState(() {
         isLoading = false;
-        memberData = resultMember;
       });
     } catch (e) {
       print(e);
@@ -293,7 +284,6 @@ class _HomePageState extends State<HomePage> {
     Map<String, dynamic> result =
         await homeController!.getListBelumAbsen(currentDate, idDivisi!);
     List<dynamic> listMemberData = result['details']['data'];
-
     return listMemberData;
   }
 
@@ -305,7 +295,7 @@ class _HomePageState extends State<HomePage> {
         Map<String, dynamic> result =
             await homeController!.getListBelumAbsen('', 0);
         List<dynamic> listData = result['details']['data'];
-
+        // print(listData.sublist(75, listData.length));
         // if (listData.length > 5) {
         //   listData = listData.sublist(startList, endList);
         // } else {
@@ -314,7 +304,8 @@ class _HomePageState extends State<HomePage> {
 
         return listData;
       } else {
-       
+        // print(currentDate);
+        // Panggil getListBelumAbsen dengan parameter sesuai pilihan
         Map<String, dynamic> result = await homeController!
             .getListBelumAbsen(currentDate, int.parse(_selectedFilter));
         List<dynamic> listData = result['details']['data'];
@@ -323,7 +314,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           listData = listData.sublist(0, listData.length);
         }
-        
+        // print(listData.length);
         // setState(() {
         // ListDataEmployee = listData;
         // });
@@ -379,6 +370,7 @@ class _HomePageState extends State<HomePage> {
 
   void _clockOut(BuildContext context) async {
     LocationPermission permission = await Geolocator.requestPermission();
+    // print('permission');
 
     if (permission == LocationPermission.denied) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -431,10 +423,11 @@ class _HomePageState extends State<HomePage> {
       endList = endList + 5;
     });
     if (_selectedFilter == 'All') {
+      // Panggil getListBelumAbsen tanpa parameter jika "Semua" dipilih
       Map<String, dynamic> result =
           await homeController!.getListBelumAbsen('', 0);
       List<dynamic> listData = result['details']['data'];
-
+      // print(ListDataEmployee.length);
       if ((ListDataEmployee.length + 5) < listData.length) {
         listData = listData.sublist(startList, endList);
       } else {
@@ -447,6 +440,8 @@ class _HomePageState extends State<HomePage> {
         ListDataEmployee.addAll(listData);
       });
     } else {
+      // print(currentDate);
+      // Panggil getListBelumAbsen dengan parameter sesuai pilihan
       Map<String, dynamic> result = await homeController!
           .getListBelumAbsen(currentDate, int.parse(_selectedFilter));
       List<dynamic> listData = result['details']['data'];
@@ -468,10 +463,13 @@ class _HomePageState extends State<HomePage> {
         });
       }
     }
+
+    // print(endList);
   }
 
   @override
   Widget build(BuildContext context) {
+    // print(ListDataEmployee.length);
     Widget headerBackground() => const HeaderCircle(diameter: 500);
     Widget Headers() {
       return headerBackground();
@@ -507,26 +505,30 @@ class _HomePageState extends State<HomePage> {
               color: ColorsTheme.white,
             ),
           ));
-      Widget absnetButton(name, status, clockIn) => ElevatedButton(
-            onPressed: status
-                ? (clockIn ? () => _clockIn(context) : () => _clockOut(context))
-                : null,
-            style: ElevatedButton.styleFrom(
-              backgroundColor:
-                  status ? Color.fromARGB(255, 2, 65, 128) : Colors.grey,
-            ),
-            child: Row(
-              children: <Widget>[
-                Text(
-                  name,
-                  style: TextStyle(
-                      color: status
-                          ? ColorsTheme.whiteCream
-                          : ColorsTheme.lightGrey),
-                ),
-              ],
-            ),
-          );
+      Widget absnetButton(name, status, clockIn, loading) => (loading)
+          ? absnetButtonLoading()
+          : ElevatedButton(
+              onPressed: status
+                  ? (clockIn
+                      ? () => _clockIn(context)
+                      : () => _clockOut(context))
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    status ? Color.fromARGB(255, 2, 65, 128) : Colors.grey,
+              ),
+              child: Row(
+                children: <Widget>[
+                  Text(
+                    name,
+                    style: TextStyle(
+                        color: status
+                            ? ColorsTheme.whiteCream
+                            : ColorsTheme.lightGrey),
+                  ),
+                ],
+              ),
+            );
 
       return Container(
         margin: const EdgeInsets.only(top: 20, bottom: 20),
@@ -600,12 +602,9 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                (statusLoading)
-                    ? absnetButtonLoading()
-                    : absnetButton('Clock In', canAbsent(true), true),
-                (statusLoading)
-                    ? absnetButtonLoading()
-                    : absnetButton('Clock Out', canAbsent(false), false),
+                absnetButton('Clock In', canClockIn, canClockIn, statusLoading),
+                absnetButton(
+                    'Clock Out', canClockOut, canClockIn, statusLoading),
               ],
             ),
           ),
@@ -869,16 +868,9 @@ class _HomePageState extends State<HomePage> {
                 margin: EdgeInsets.symmetric(horizontal: 10.w),
                 child: Row(
                   children: [
-                    // Text('${datalist['clock_in']}')
-                    Icon(Icons.input,
-                        color: (datalist['clock_in'] == 1)
-                            ? ColorsTheme.lightGreen
-                            : ColorsTheme.lightGrey),
+                    Icon(Icons.input, color: ColorsTheme.lightGrey),
                     SizedBox(width: 8),
-                    Icon(Icons.output,
-                        color: (datalist['clock_out'] == 1)
-                            ? ColorsTheme.lightRed
-                            : ColorsTheme.lightGrey),
+                    Icon(Icons.output, color: ColorsTheme.lightGrey),
                   ],
                 ),
               ),
@@ -1019,7 +1011,7 @@ class _HomePageState extends State<HomePage> {
 
     Widget body() {
       return FutureBuilder(
-          future: _loadData,
+          future: _fetchData(),
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return contentLoadedData(false);
@@ -1086,195 +1078,106 @@ class _HomePageState extends State<HomePage> {
               child: InkWell(
                 onTap: () async {
                   Navigator.pushNamed(context, '/listMember',
-                      arguments: idDivisi);
+                      arguments: await _fetchMemberData());
                 },
                 child: Container(
-                    child: (isLoading)
-                        ? Container(
-                            height: 70.w,
-                            decoration: BoxDecoration(
-                              color: ColorsTheme.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(
-                                      0, 3), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                          )
-                        : Container(
-                            decoration: BoxDecoration(
-                              color: ColorsTheme.white,
-                              borderRadius: BorderRadius.circular(8),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 5,
-                                  blurRadius: 7,
-                                  offset: Offset(
-                                      0, 3), // changes position of shadow
-                                ),
-                              ],
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Container(
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal: 20.w, vertical: 10.w),
-                                    child: Row(
-                                      children: List.generate(
-                                        (memberData.length <= 3)
-                                            ? memberData.length
-                                            : 3,
-                                        (index) => Align(
+                  child: FutureBuilder<List<dynamic>>(
+                    future: _fetchMemberData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Container(
+                          height: 70.w,
+                          decoration: BoxDecoration(
+                            color: ColorsTheme.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else if (snapshot.hasData) {
+                        List<dynamic> data = snapshot.data!;
+                        return Container(
+                          decoration: BoxDecoration(
+                            color: ColorsTheme.white,
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.2),
+                                spreadRadius: 5,
+                                blurRadius: 7,
+                                offset:
+                                    Offset(0, 3), // changes position of shadow
+                              ),
+                            ],
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 20.w, vertical: 10.w),
+                                  child: Row(
+                                    children: List.generate(
+                                      (data.length <= 3) ? data.length : 3,
+                                      (index) => Align(
+                                        child: CircleAvatar(
+                                          radius: 25.r,
+                                          backgroundColor:
+                                              ColorsTheme.lightGrey2,
                                           child: CircleAvatar(
-                                            radius: 25.r,
-                                            backgroundColor:
-                                                ColorsTheme.lightGrey2,
-                                            child: CircleAvatar(
-                                              radius: 23.r,
-                                              backgroundImage: NetworkImage(
-                                                  memberData[index]['image']),
-                                            ),
+                                            radius: 23.r,
+                                            backgroundImage: NetworkImage(
+                                                data[index]['image']),
                                           ),
                                         ),
-                                      )..addAll(
-                                          (memberData.length > 3)
-                                              ? [
-                                                  Align(
+                                      ),
+                                    )..addAll(
+                                        (data.length > 3)
+                                            ? [
+                                                Align(
+                                                  child: CircleAvatar(
+                                                    radius: 25.r,
+                                                    backgroundColor:
+                                                        ColorsTheme.lightGrey2,
                                                     child: CircleAvatar(
-                                                      radius: 25.r,
-                                                      backgroundColor:
-                                                          ColorsTheme
-                                                              .lightGrey2,
-                                                      child: CircleAvatar(
-                                                        radius: 23.r,
-                                                        backgroundColor: ColorsTheme
-                                                            .white, // Set grey background
-                                                        child: Text(
-                                                          '+${memberData.length - 3}',
-                                                          style: TextStyle(
-                                                              color: ColorsTheme
-                                                                  .black),
-                                                        ),
+                                                      radius: 23.r,
+                                                      backgroundColor: ColorsTheme
+                                                          .white, // Set grey background
+                                                      child: Text(
+                                                        '+${data.length - 3}',
+                                                        style: TextStyle(
+                                                            color: ColorsTheme
+                                                                .black),
                                                       ),
                                                     ),
                                                   ),
-                                                ]
-                                              : [],
-                                        ),
-                                    )),
-                                Container(
-                                    margin: EdgeInsets.symmetric(
-                                        horizontal: 20.w, vertical: 10.w),
-                                    child: Icon(Icons.arrow_forward_ios)),
-                              ],
-                            ),
-                          )),
-                // child: Container(
-                //   child: FutureBuilder<List<dynamic>>(
-                //     future: _fetchMemberData(),
-                //     builder: (context, snapshot) {
-                //       // print(snapshot.data);
-                //       if (snapshot.connectionState == ConnectionState.waiting) {
-                // return Container(
-                //   height: 70.w,
-                //   decoration: BoxDecoration(
-                //     color: ColorsTheme.white,
-                //     borderRadius: BorderRadius.circular(8),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.grey.withOpacity(0.2),
-                //         spreadRadius: 5,
-                //         blurRadius: 7,
-                //         offset:
-                //             Offset(0, 3), // changes position of shadow
-                //       ),
-                //     ],
-                //   ),
-                // );
-                //       } else if (snapshot.hasError) {
-                //         return Text('Error: ${snapshot.error}');
-                //       } else if (snapshot.hasData) {
-                //         List<dynamic> data = snapshot.data!;
-                // return Container(
-                //   decoration: BoxDecoration(
-                //     color: ColorsTheme.white,
-                //     borderRadius: BorderRadius.circular(8),
-                //     boxShadow: [
-                //       BoxShadow(
-                //         color: Colors.grey.withOpacity(0.2),
-                //         spreadRadius: 5,
-                //         blurRadius: 7,
-                //         offset:
-                //             Offset(0, 3), // changes position of shadow
-                //       ),
-                //     ],
-                //   ),
-                //   child: Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //     children: [
-                //       Container(
-                //           margin: EdgeInsets.symmetric(
-                //               horizontal: 20.w, vertical: 10.w),
-                //           child: Row(
-                //             children: List.generate(
-                //               (data.length <= 3) ? data.length : 3,
-                //               (index) => Align(
-                //                 child: CircleAvatar(
-                //                   radius: 25.r,
-                //                   backgroundColor:
-                //                       ColorsTheme.lightGrey2,
-                //                   child: CircleAvatar(
-                //                     radius: 23.r,
-                //                     backgroundImage: NetworkImage(
-                //                         data[index]['image']),
-                //                   ),
-                //                 ),
-                //               ),
-                //             )..addAll(
-                //                 (data.length > 3)
-                //                     ? [
-                //                         Align(
-                //                           child: CircleAvatar(
-                //                             radius: 25.r,
-                //                             backgroundColor:
-                //                                 ColorsTheme.lightGrey2,
-                //                             child: CircleAvatar(
-                //                               radius: 23.r,
-                //                               backgroundColor: ColorsTheme
-                //                                   .white, // Set grey background
-                //                               child: Text(
-                //                                 '+${data.length - 3}',
-                //                                 style: TextStyle(
-                //                                     color: ColorsTheme
-                //                                         .black),
-                //                               ),
-                //                             ),
-                //                           ),
-                //                         ),
-                //                       ]
-                //                     : [],
-                //               ),
-                //           )),
-                //       Container(
-                //           margin: EdgeInsets.symmetric(
-                //               horizontal: 20.w, vertical: 10.w),
-                //           child: Icon(Icons.arrow_forward_ios)),
-                //     ],
-                //   ),
-                // );
-                //       } else {
-                //         return Text('No data available');
-                //       }
-                //     },
-                //   ),
-                // ),
+                                                ),
+                                              ]
+                                            : [],
+                                      ),
+                                  )),
+                              Container(
+                                  margin: EdgeInsets.symmetric(
+                                      horizontal: 20.w, vertical: 10.w),
+                                  child: Icon(Icons.arrow_forward_ios)),
+                            ],
+                          ),
+                        );
+                      } else {
+                        return Text('No data available');
+                      }
+                    },
+                  ),
+                ),
               ),
             )
           ],

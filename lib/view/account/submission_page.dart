@@ -93,6 +93,17 @@ class _SubmissionPageState extends State<SubmissionPage> {
             Navigator.pop(context, 'true');
           },
         ),
+        actions: [
+          IconButton(
+                icon: Icon(MdiIcons.filter),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (context) => _buildFilter(),
+                  );
+                },
+              ),
+        ]
       ),
       body: RefreshWidget(onRefresh: refreshItem, child: body()),
       floatingActionButton: Padding(
@@ -150,20 +161,8 @@ class _SubmissionPageState extends State<SubmissionPage> {
     return Container(
       child: Column(
         children: [
-          Row(
-            children: [
               MonthPicker(formattedDate),
-              IconButton(
-                icon: Icon(MdiIcons.filter),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (context) => _buildFilter(),
-                  );
-                },
-              ),
-            ],
-          ),
+          
           (!isLoading)
               ? Center(child: CircularProgressIndicator())
               : (listData.isNotEmpty)
@@ -212,7 +211,7 @@ class _SubmissionPageState extends State<SubmissionPage> {
 
   Widget MonthPicker(formattedDate) {
     return Container(
-      margin: EdgeInsets.only(left: 15.w),
+      margin: EdgeInsets.symmetric(horizontal: 15.w),
       child: TextButton(
         onPressed: () {
           _selectMonth(context);
@@ -242,7 +241,6 @@ class _SubmissionPageState extends State<SubmissionPage> {
                 ],
               ),
             ),
-            SizedBox(width: 150.w),
             Icon(
               Icons.arrow_drop_down,
               size: 24,

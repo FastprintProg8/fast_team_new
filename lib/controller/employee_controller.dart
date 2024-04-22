@@ -10,7 +10,7 @@ class EmployeeController {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
     var result = await employeeNetUtils.retrieveEmployeeList(token);
-    print(ResponseHelper().jsonResponse(result));
+    // print(ResponseHelper().jsonResponse(result));
 
     return ResponseHelper().jsonResponse(result);
   }

@@ -170,7 +170,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return contentBody(false);
           } else if (snapshot.hasError) {
-            SchedulerBinding.instance!.addPostFrameCallback((_) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
               var snackbar = SnackBar(
                 content: Text('Error: ${snapshot.error}',
                     style: alertErrorTextStyle),

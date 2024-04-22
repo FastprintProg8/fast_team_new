@@ -30,4 +30,9 @@ class AccountController extends GetxController {
     var result = await employeeNetUtils.retrieveEmployeeInfo(userEmployeeId);
     return ResponseHelper().jsonResponse(result);
   }
+
+  retrieveEmployeeBank() async{
+    var result = await employeeNetUtils.retrieveEmployeeBank() ;
+    return ResponseHelper().jsonResponse(result);
+  }
 }

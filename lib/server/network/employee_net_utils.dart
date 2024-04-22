@@ -29,14 +29,21 @@ class EmployeeNetUtils {
 
   retrieveEmployeeList(token) async {
     Map<String, String> headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Bearer $token',
-  };
-  print(headers);
-    var response = await http.get(
-        Uri.parse("${BaseServer.serverUrl}/api_absensi/user-absen/"),
-        headers: headers).timeout(BaseServer.durationlimit);
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    var response = await http
+        .get(Uri.parse("${BaseServer.serverUrl}/api_absensi/user-absen/"),
+            headers: headers)
+        .timeout(BaseServer.durationlimit);
 
+    return response;
+  }
+
+  retrieveEmployeeBank() async {
+    var url = "${BaseServer.serverUrl}/api/bank/";
+    var response =
+        await http.get(Uri.parse(url)).timeout(BaseServer.durationlimit);
     return response;
   }
 }

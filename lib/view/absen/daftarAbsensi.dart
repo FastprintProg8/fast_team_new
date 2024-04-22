@@ -60,6 +60,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
     absentController = Get.put(AbsentController());
 
     final data = await absentController!.retriveAbsentData(_selectedDate);
+    // print(data);
     final totalData = await absentController!.retriveTotalData(_selectedDate);
     setState(() {
       _data = data;
@@ -81,7 +82,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
-          print(date);
+        
         });
         await _loadDataForSelectedMonth();
       }
@@ -198,6 +199,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
           itemBuilder: (BuildContext context, int index) {
             final Map<String, dynamic> item =
                 _data.isNotEmpty ? _data[index] : {};
+                
             String tanggal = (index + 1).toString();
             bool isSunday = item['isSunday'] ?? false;
             Color dateColor =

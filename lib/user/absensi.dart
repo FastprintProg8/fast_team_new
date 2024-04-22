@@ -240,7 +240,7 @@ class _AbsensiPageState extends State<AbsensiPage> {
                                   'aksi': rowData['aksi']
                                 });
 
-                            print(rowData);
+                            
                             // int id = rowData['id'];
                             // print('DataCell clicked with id: $id');
                           },

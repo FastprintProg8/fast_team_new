@@ -20,6 +20,7 @@ import 'package:Fast_Team/view/navigator_bottom_menu.dart';
 import 'package:Fast_Team/view/sertificate.dart';
 import 'package:Fast_Team/view/splash_screen_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:month_year_picker/month_year_picker.dart';
@@ -33,9 +34,10 @@ import 'view/home.dart';
 import 'view/absen/map.dart';
 import 'view/request/request.dart';
 
-void main() {
-  // WidgetsFlutterBinding
-  //     .ensureInitialized(); // Pastikan Flutter sudah terinisialisasi
+void main() async {
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Pastikan Flutter sudah terinisialisasi
+  await FlutterDownloader.initialize();
   // SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   // String avatarImageUrl = sharedPreferences.getString('user-img_url') ?? '';
   // int userId = sharedPreferences.getInt('user-id_user') ?? 0;

@@ -6,15 +6,25 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class PayrollController {
   PayrollNetUtils payrollNetUtils = Get.put(PayrollNetUtils());
-  retrivePayroll( date) async {
+  retrivePayroll(date) async {
      SharedPreferences prefs = await SharedPreferences.getInstance();
     var userEmployeeId = prefs.getInt('user-employee_id');
-    var result = await payrollNetUtils.requestPayroll(userEmployeeId, date);
+    var token = prefs.getString('token');
+    var result = await payrollNetUtils.requestPayroll(token,userEmployeeId, date);
     return ResponseHelper().jsonResponse(result);
   }
 
   retriveDetailPayroll(payroll_id)async{
-    var result = await payrollNetUtils.requestDetailPayroll(payroll_id);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await payrollNetUtils.requestDetailPayroll(token,payroll_id);
     return  ResponseHelper().jsonResponse(result);
+  }
+
+  retriveLinkDownloadPayslip(payroll_id)async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await payrollNetUtils.requestLinkDownloadPayslip(token, payroll_id);
+    return ResponseHelper().jsonResponse(result);
   }
 }

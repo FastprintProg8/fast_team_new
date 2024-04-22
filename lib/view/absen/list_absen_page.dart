@@ -1,8 +1,10 @@
+import 'package:Fast_Team/controller/home_controller.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:get/get.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
@@ -16,8 +18,10 @@ class ListAbsentPage extends StatefulWidget {
 }
 
 class _ListAbsentPageState extends State<ListAbsentPage> {
-  List<dynamic>? routeArguments;
+  int? routeArguments;
   DateTime selectedDate = DateTime.now();
+  HomeController? homeController;
+  List<dynamic>? dataMember;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -26,20 +30,44 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
 
   initData() async {
     setState(() {
-      routeArguments =
-          ModalRoute.of(context)?.settings.arguments as List<dynamic>?;
+      routeArguments = ModalRoute.of(context)?.settings.arguments as int?;
     });
+    // print(routeArguments);
+
+    var result = await _fetchMemberData();
+    setState(() {
+      dataMember = result;
+    });
+    // print(dataMember);
   }
 
-  _onDaySelected(DateTime day, DateTime focusedDay) {
+  _onDaySelected(DateTime day, DateTime focusedDay) async {
     setState(() {
       selectedDate = day;
     });
+
+    var result = await _fetchMemberData();
+    setState(() {
+      dataMember = result;
+    });
+  }
+
+  Future<List<dynamic>> _fetchMemberData() async {
+    homeController = Get.put(HomeController());
+    String dateTimeString = '$selectedDate';
+    int lastIndex = dateTimeString.lastIndexOf(" ");
+    String formatedDate = dateTimeString.substring(0, lastIndex);
+
+    Map<String, dynamic> result =
+        await homeController!.getListBelumAbsen(formatedDate, routeArguments!);
+    List<dynamic> listMemberData = result['details']['data'];
+    // print(listMemberData);
+    return listMemberData;
   }
 
   @override
   Widget build(BuildContext context) {
-    print(selectedDate);
+    // print(selectedDate);
     return Scaffold(
       appBar: AppBar(
           title: const Text(
@@ -59,16 +87,26 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
               Navigator.pop(context, 'true');
             },
           )),
-      body: Stack(
-        fit: StackFit.expand,
-        children: [
-          _calendar(),
-          _listMember(),
-
-          // showBottomSheet(context: context, builder: (builder)),
-          // _listMember(),
-        ],
-      ),
+      body: FutureBuilder<List<dynamic>>(
+          future: _fetchMemberData(),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              // Menampilkan indikator loading jika data masih dimuat
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              // Menampilkan pesan kesalahan jika ada kesalahan dalam memuat data
+              return Text('Error: ${snapshot.error}');
+            } else {
+              return Stack(
+                fit: StackFit.expand,
+                children: [
+                  _calendar(),
+                  _listMember(),
+                ],
+              );
+            }
+          }),
     );
   }
 
@@ -95,50 +133,51 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                     width: 50.w,
                     color: ColorsTheme.darkGrey,
                   ),
-                  Container(
-                    margin: EdgeInsets.only(top: 20.w, left: 15.w, right: 15.w),
-                    padding: EdgeInsets.only(left: 10, right: 10),
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.grey),
-                    ),
-                    child: DropdownButton<String>(
-                      isExpanded: true,
-                      value: "All Activity",
-                      items: [
-                        DropdownMenuItem<String>(
-                          value: 'All Activity',
-                          child: Text(
-                            'All Activity | 4',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'Not Clock In',
-                          child: Text(
-                            'Not Clock In | 0',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                        DropdownMenuItem<String>(
-                          value: 'All Leave',
-                          child: Text(
-                            'All Leave | 0',
-                            style: TextStyle(fontSize: 16),
-                          ),
-                        ),
-                      ],
-                      onChanged: (newValue) {},
-                    ),
-                  ),
+                  // Container(
+                  //   margin: EdgeInsets.only(top: 20.w, left: 15.w, right: 15.w),
+                  //   padding: EdgeInsets.only(left: 10, right: 10),
+                  //   decoration: BoxDecoration(
+                  //     borderRadius: BorderRadius.circular(8),
+                  //     border: Border.all(color: Colors.grey),
+                  //   ),
+                  //   child: DropdownButton<String>(
+                  //     isExpanded: true,
+                  //     value: "All Activity",
+                  //     items: [
+                  //       DropdownMenuItem<String>(
+                  //         value: 'All Activity',
+                  //         child: Text(
+                  //           'All Activity | 4',
+                  //           style: TextStyle(fontSize: 16),
+                  //         ),
+                  //       ),
+                  //       DropdownMenuItem<String>(
+                  //         value: 'Not Clock In',
+                  //         child: Text(
+                  //           'Not Clock In | 0',
+                  //           style: TextStyle(fontSize: 16),
+                  //         ),
+                  //       ),
+                  //       DropdownMenuItem<String>(
+                  //         value: 'All Leave',
+                  //         child: Text(
+                  //           'All Leave | 0',
+                  //           style: TextStyle(fontSize: 16),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //     onChanged: (newValue) {},
+                  //   ),
+                  // ),
                 ],
               ),
               ListView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
-                itemCount: routeArguments!.length,
+                itemCount: dataMember!.length,
                 itemBuilder: (context, index) {
-                  final employee = routeArguments![index];
+                  final employee = dataMember![index];
+
                   return Column(
                     children: [
                       Container(
@@ -278,8 +317,12 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 5.w),
                     child: CalendarCarousel(
-                      onDayPressed: (DateTime date, List events) {
+                      onDayPressed: (DateTime date, List events) async {
                         this.setState(() => selectedDate = date);
+                        var result = await _fetchMemberData();
+                        setState(() {
+                          dataMember = result;
+                        });
                       },
                       locale: 'id_ID',
                       targetDateTime: selectedDate,
@@ -328,9 +371,13 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                       Padding(
                         padding: EdgeInsets.only(right: 5.w),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
                             setState(() {
                               selectedDate = DateTime.now();
+                            });
+                            var result = await _fetchMemberData();
+                            setState(() {
+                              dataMember = result;
                             });
                           },
                           style: ElevatedButton.styleFrom(

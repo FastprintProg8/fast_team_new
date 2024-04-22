@@ -63,6 +63,7 @@ dependencies:
   file_picker: ^4.0.0
   permission_handler: ^11.3.1
   path: ^1.9.0
+  flutter_downloader: ^1.11.7
 
 dev_dependencies:
   flutter_test:

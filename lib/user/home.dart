@@ -80,7 +80,7 @@ class _HomePageState extends State<HomePage> {
     }
 
     permission = await Geolocator.checkPermission();
-    print(permission);
+  
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission != LocationPermission.whileInUse &&
@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> {
 
   void _clockOut(BuildContext context) async{
     LocationPermission permission = await Geolocator.requestPermission();
-    print('permission');
+    
     // Periksa status izin lokasi
     if (permission == LocationPermission.denied) {
       // Izin ditolak, tampilkan Snackbar

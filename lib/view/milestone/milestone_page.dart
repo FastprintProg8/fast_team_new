@@ -68,41 +68,43 @@ class _MilestonePageState extends State<MilestonePage> {
           )),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 0.w),
-        child: ListView.builder(
-            shrinkWrap: true,
-            // physics: NeverScrollableScrollPhysics(),
-            itemCount: arrayData.length,
-            itemBuilder: (context, index) {
-              DateTime dateTime =
-                  DateTime.parse(arrayData[index]['start_date'].toString());
-              DateFormat formatter = DateFormat('dd MMMM yyyy');
-              String formattedMonthYear = formatter.format(dateTime);
-              Color color = colors[index % colors.length];
-              return Column(
-                children: [
-                  (index % 2 == 0)
-                      ? _leftMilestone(
-                          (index == arrayData.length - 1) ? true : false,
-                          (index == 0) ? true : false,
-                          formattedMonthYear,
-                          arrayData[index]['pegawai']['nama_lengkap'],
-                          arrayData[index]['title'],
-                          arrayData[index]['job_level']['name'],
-                          arrayData[index]['position']['name'],
-                          arrayData[index]['salary'],
-                          color)
-                      : _rightMilestone(
-                          (index == arrayData.length) ? true : false,
-                          formattedMonthYear,
-                          arrayData[index]['pegawai']['nama_lengkap'],
-                          arrayData[index]['title'],
-                          arrayData[index]['job_level']['name'],
-                          arrayData[index]['position']['name'],
-                          arrayData[index]['salary'],
-                          color),
-                ],
-              );
-            }),
+        child: arrayData.isEmpty
+            ? _noNotifications()
+            : ListView.builder(
+                shrinkWrap: true,
+                // physics: NeverScrollableScrollPhysics(),
+                itemCount: arrayData.length,
+                itemBuilder: (context, index) {
+                  DateTime dateTime =
+                      DateTime.parse(arrayData[index]['start_date'].toString());
+                  DateFormat formatter = DateFormat('dd MMMM yyyy');
+                  String formattedMonthYear = formatter.format(dateTime);
+                  Color color = colors[index % colors.length];
+                  return Column(
+                    children: [
+                      (index % 2 == 0)
+                          ? _leftMilestone(
+                              (index == arrayData.length - 1) ? true : false,
+                              (index == 0) ? true : false,
+                              formattedMonthYear,
+                              arrayData[index]['pegawai']['nama_lengkap'],
+                              arrayData[index]['title'],
+                              arrayData[index]['job_level']['name'],
+                              arrayData[index]['position']['name'],
+                              arrayData[index]['salary'],
+                              color)
+                          : _rightMilestone(
+                              (index == arrayData.length) ? true : false,
+                              formattedMonthYear,
+                              arrayData[index]['pegawai']['nama_lengkap'],
+                              arrayData[index]['title'],
+                              arrayData[index]['job_level']['name'],
+                              arrayData[index]['position']['name'],
+                              arrayData[index]['salary'],
+                              color),
+                    ],
+                  );
+                }),
       ),
     );
   }
@@ -305,6 +307,41 @@ class _MilestonePageState extends State<MilestonePage> {
               )
             : Container(),
       ],
+    );
+  }
+
+  Widget _noNotifications() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            width: 200, // Adjust width as needed
+            height: 200, // Adjust height as needed
+            decoration: BoxDecoration(
+              color: Colors.blue[100], // Adjust color as needed
+              borderRadius: BorderRadius.circular(
+                  100), // Half the height for an oval shape
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.update,
+                size: 100.0,
+                color: Colors.blue,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 16.0,
+          ),
+          const Text(
+            'There is no data',
+            style: TextStyle(
+              fontSize: 18,
+            ),
+          )
+        ],
+      ),
     );
   }
 }

@@ -10,6 +10,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -18,6 +19,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:path/path.dart' as path;
+import 'package:url_launcher/url_launcher.dart';
 
 class PayslipPage extends StatefulWidget {
   const PayslipPage({super.key});
@@ -27,10 +29,12 @@ class PayslipPage extends StatefulWidget {
 }
 
 class _PayslipPageState extends State<PayslipPage> {
+  double? progressDownload;
   var nama;
   var posisi;
   var divisi;
   var id_account;
+  var id_payroll;
   var imgUrl;
   var basic_salary = 0;
   var net_salary = 0;
@@ -66,6 +70,7 @@ class _PayslipPageState extends State<PayslipPage> {
     nama = "".obs;
     posisi = "".obs;
     imgUrl = "".obs;
+    id_payroll = "".obs;
 
     setState(() {
       _fetchData = initData();
@@ -76,25 +81,27 @@ class _PayslipPageState extends State<PayslipPage> {
     AccountController accountController = Get.put(AccountController());
     String formattedDate = formatDate(_selectedDate);
     var result = await accountController.retriveAccountInformation();
-
     AccountInformationModel accountModel =
         AccountInformationModel.fromJson(result['details']['data']);
     PayrollController payrollController = Get.put(PayrollController());
     var salaryResult = await payrollController.retrivePayroll(formattedDate);
     var salaryDetail = await payrollController
         .retriveDetailPayroll(salaryResult['details']['id']);
+    // print(salaryResult);
     setState(() {
       id_account = accountModel.id;
       nama = accountModel.fullName;
       posisi = accountModel.posisiPekerjaan;
       divisi = accountModel.divisi;
       imgUrl = accountModel.imgProfUrl;
+      id_payroll = salaryResult['details']['id'];
       basic_salary = salaryResult['details']['basic_salary'];
       net_salary = salaryResult['details']['take_home_pay'];
       detail_payroll = salaryDetail['details'];
       deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
       allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
     });
+    // print(salaryResult);
   }
 
   int calculateTotalDeductionAmount(List<dynamic> data, type) {
@@ -128,151 +135,25 @@ class _PayslipPageState extends State<PayslipPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
+           _fetchData = initData();
         });
         // await _loadDataForSelectedMonth();
       }
     });
   }
 
-  Future<void> createPDF() async {
-    final pdf = pw.Document();
-    final img = await rootBundle.load('assets/img/logoFP.png');
-    final imageBytes = img.buffer.asUint8List();
-
-    List<List<String>> tableData = [
-      ['No', 'Nama', 'Usia'],
-      ['1', 'John Doe', '30'],
-      ['2', 'Jane Doe', '25'],
-      ['3', 'Alice', '35'],
-    ];
-    pw.Table table = pw.Table(
-      border: pw.TableBorder.all(),
-      children: [
-        // Baris header
-        pw.TableRow(
-          children: tableData.first
-              .map((title) => pw.Container(
-                    alignment: pw.Alignment.center,
-                    child: pw.Text(title,
-                        style: pw.TextStyle(fontWeight: pw.FontWeight.bold)),
-                    padding: pw.EdgeInsets.all(8),
-                  ))
-              .toList(),
+  Future<void> download() async {
+    PayrollController payrollController = Get.put(PayrollController());
+    var result = await payrollController.retriveLinkDownloadPayslip(id_payroll);
+    Map<String, dynamic> jsonData = result['details'];
+    var url = Uri.parse(jsonData['message']);
+    if (!await launchUrl(url)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Download Failed"),
         ),
-        // Data
-        ...tableData
-            .skip(1)
-            .map((row) => pw.TableRow(
-                  children: row
-                      .map((cell) => pw.Container(
-                            alignment: pw.Alignment.center,
-                            child: pw.Text(cell),
-                            padding: pw.EdgeInsets.all(8),
-                          ))
-                      .toList(),
-                ))
-            .toList(),
-      ],
-    );
-    pw.Image image1 = pw.Image(pw.MemoryImage(imageBytes));
-    pdf.addPage(pw.Page(
-      build: (pw.Context context) {
-        return pw.Container(
-          child: pw.Column(children: [
-            pw.Container(
-              height: 80.w,
-              child: image1,
-            ),
-            pw.Container(
-              padding: pw.EdgeInsets.only(top: 50.w, bottom: 20.w),
-              child: pw.Row(
-                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-                children: [
-                  pw.Text(
-                    'Fast Print Indonesia',
-                    style: pw.TextStyle(
-                      color: PdfColor.fromInt(0xff000000),
-                      fontSize: 12.sp,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                  pw.Text(
-                    'PAYSLIP',
-                    style: pw.TextStyle(
-                      color: PdfColor.fromInt(0xff000000),
-                      fontSize: 12.sp,
-                      fontWeight: pw.FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            pw.Row(
-              children: [
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text('Payroll Date'),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text('Name'),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text('Job Position'),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text('Organization'),
-                    ),
-                  ],
-                ),
-                pw.SizedBox(width: 18.w),
-                pw.Column(
-                  crossAxisAlignment: pw.CrossAxisAlignment.start,
-                  children: [
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text(': ${formatDate(_selectedDate)}'),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text(': ${nama}'),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text(': ${posisi}'),
-                    ),
-                    pw.Container(
-                      padding: pw.EdgeInsets.only(bottom: 6.h),
-                      child: pw.Text(': ${divisi}'),
-                    ),
-                  ],
-                ),
-                pw.Padding(
-                  padding: pw.EdgeInsets.symmetric(vertical: 20),
-                  child: table,
-                ),
-              ],
-            ),
-          ]),
-        );
-      },
-    ));
-
-    String? selectedDirectory = await FilePicker.platform.getDirectoryPath();
-
-    // if (dpath != null) {
-    //   var p = path.join(dpath, 'test.jpg');
-    //   print('save path:  $p'); // save path: /storage/emulated/0/.Android/test.jpg
-    // }
-
-    //   print('test');
-    final file = File("${selectedDirectory}/example.pdf");
-    await file.writeAsBytes(await pdf.save());
+      );
+    }
   }
 
   @override
@@ -286,20 +167,11 @@ class _PayslipPageState extends State<PayslipPage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance.addPostFrameCallback((_) {
-                var snackbar = SnackBar(
-                  content: Text('Error: ${snapshot.error}',
-                      style: alertErrorTextStyle),
-                  backgroundColor: ColorsTheme.lightRed,
-                  behavior: SnackBarBehavior.floating,
-                );
-                ScaffoldMessenger.of(context).showSnackBar(snackbar);
-              });
-              return Center(child: CircularProgressIndicator());
+              return  _bodyContent(context, formattedDate,true);
             } else if (snapshot.hasData) {
-              return _bodyContent(context, formattedDate);
+              return _bodyContent(context, formattedDate,false);
             } else {
-              return _bodyContent(context, formattedDate);
+              return _bodyContent(context, formattedDate,false);
             }
           });
     }
@@ -329,7 +201,7 @@ class _PayslipPageState extends State<PayslipPage> {
         ));
   }
 
-  Widget _bodyContent(BuildContext context, String formattedDate) {
+  Widget _bodyContent(BuildContext context, String formattedDate,bool isEmpty) {
     return Container(
       child: Column(
         children: [
@@ -374,6 +246,7 @@ class _PayslipPageState extends State<PayslipPage> {
           ),
           _cardInfo(context),
           SizedBox(height: 20.h),
+          (!isEmpty)?
           Expanded(
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 10.w),
@@ -385,8 +258,8 @@ class _PayslipPageState extends State<PayslipPage> {
                   ),
                   ElevatedButton(
                       onPressed: () {
-                        createPDF().then((_) {
-                          print('PDF created!');
+                        download().then((_) {
+                          print('Payslip is downloaded !');
                         });
                       },
                       style: ElevatedButton.styleFrom(
@@ -401,12 +274,45 @@ class _PayslipPageState extends State<PayslipPage> {
                 ],
               ),
             ),
+          ): _noNotifications()
+        ],
+      ),
+    );
+  }
+  Widget _noNotifications() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Container(
+            width: 200, // Adjust width as needed
+            height: 200, // Adjust height as needed
+            decoration: BoxDecoration(
+              color: Colors.blue[100], // Adjust color as needed
+              borderRadius: BorderRadius.circular(
+                  100), // Half the height for an oval shape
+            ),
+            child: const Center(
+              child: Icon(
+                Icons.update,
+                size: 100.0,
+                color: Colors.blue,
+              ),
+            ),
+          ),
+          const SizedBox(
+            height: 16.0,
+          ),
+          const Text(
+            'There is no data',
+            style: TextStyle(
+              fontSize: 18,
+            ),
           )
         ],
       ),
     );
   }
-
   Widget _salarySlipCard(BuildContext context) {
     return Card(
       child: ExpansionTile(
@@ -515,65 +421,142 @@ class _PayslipPageState extends State<PayslipPage> {
                             }).toList(),
                         ],
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
                         children: [
-                          Text(
-                            "Rp ${formatCurrency(basic_salary)}",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Rp. ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(""),
+                              if (detail_payroll
+                                  .isEmpty) // Cek apakah data kosong
+                                Text("") // Jika kosong, kembalikan Text kosong
+                              else if (detail_payroll
+                                  .where((item) => item["type"] == "allowance")
+                                  .isEmpty)
+                                Text(
+                                  "-",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              else
+                                ...detail_payroll
+                                    .where(
+                                        (item) => item["type"] == "allowance")
+                                    .map((item) {
+                                  int amount = item["amount"];
+                                  String formattedAmount =
+                                      formatCurrency(amount);
+                                  return Text(
+                                    "Rp. ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                }).toList(),
+                              Text(""),
+                              if (detail_payroll
+                                  .isEmpty) // Cek apakah data kosong
+                                Text("") // Jika kosong, kembalikan Text kosong
+                              else if (detail_payroll
+                                  .where((item) => item["type"] == "deduction")
+                                  .isEmpty)
+                                Text(
+                                  "-",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              else
+                                ...detail_payroll
+                                    .where(
+                                        (item) => item["type"] == "deduction")
+                                    .map((item) {
+                                  int amount = item["amount"];
+                                  String formattedAmount =
+                                      formatCurrency(amount);
+                                  return Text(
+                                    "Rp. ",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                }).toList(),
+                            ],
                           ),
-                          Text(""),
-                          if (detail_payroll.isEmpty) // Cek apakah data kosong
-                            Text("") // Jika kosong, kembalikan Text kosong
-                          else if (detail_payroll
-                              .where((item) => item["type"] == "allowance")
-                              .isEmpty)
-                            Text(
-                              "-",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          else
-                            ...detail_payroll
-                                .where((item) => item["type"] == "allowance")
-                                .map((item) {
-                              int amount = item["amount"];
-                              String formattedAmount = formatCurrency(amount);
-                              return Text(
-                                "Rp $formattedAmount",
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "${formatCurrency(basic_salary)}",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
-                              );
-                            }).toList(),
-                          Text(""),
-                          if (detail_payroll.isEmpty) // Cek apakah data kosong
-                            Text("") // Jika kosong, kembalikan Text kosong
-                          else if (detail_payroll
-                              .where((item) => item["type"] == "deduction")
-                              .isEmpty)
-                            Text(
-                              "-",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
                               ),
-                            )
-                          else
-                            ...detail_payroll
-                                .where((item) => item["type"] == "deduction")
-                                .map((item) {
-                              int amount = item["amount"];
-                              String formattedAmount = formatCurrency(amount);
-                              return Text(
-                                "Rp $formattedAmount",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              );
-                            }).toList(),
+                              Text(""),
+                              if (detail_payroll
+                                  .isEmpty) // Cek apakah data kosong
+                                Text("") // Jika kosong, kembalikan Text kosong
+                              else if (detail_payroll
+                                  .where((item) => item["type"] == "allowance")
+                                  .isEmpty)
+                                Text(
+                                  "-",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              else
+                                ...detail_payroll
+                                    .where(
+                                        (item) => item["type"] == "allowance")
+                                    .map((item) {
+                                  int amount = item["amount"];
+                                  String formattedAmount =
+                                      formatCurrency(amount);
+                                  return Text(
+                                    "$formattedAmount",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                }).toList(),
+                              Text(""),
+                              if (detail_payroll
+                                  .isEmpty) // Cek apakah data kosong
+                                Text("") // Jika kosong, kembalikan Text kosong
+                              else if (detail_payroll
+                                  .where((item) => item["type"] == "deduction")
+                                  .isEmpty)
+                                Text(
+                                  "-",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                              else
+                                ...detail_payroll
+                                    .where(
+                                        (item) => item["type"] == "deduction")
+                                    .map((item) {
+                                  int amount = item["amount"];
+                                  String formattedAmount =
+                                      formatCurrency(amount);
+                                  return Text(
+                                    "$formattedAmount",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  );
+                                }).toList(),
+                            ],
+                          ),
                         ],
                       ),
                     ],
@@ -588,7 +571,7 @@ class _PayslipPageState extends State<PayslipPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "Total Basic Salary",
+                            "Basic Salary",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                             ),
@@ -607,26 +590,54 @@ class _PayslipPageState extends State<PayslipPage> {
                           ),
                         ],
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Rp ${formatCurrency(basic_salary)}",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "Rp. ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Rp. ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "Rp. ",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            "Rp ${formatCurrency(allowance)}",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            "Rp ${formatCurrency(deduction)}",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Text(
+                                "${formatCurrency(basic_salary)}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "${formatCurrency(allowance)}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                "${formatCurrency(deduction)}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -751,7 +762,7 @@ class _PayslipPageState extends State<PayslipPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Salary",
+                        "Basic Salary",
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 15.sp,
@@ -759,10 +770,9 @@ class _PayslipPageState extends State<PayslipPage> {
                           color: ColorsTheme.white,
                         ),
                       ),
-                      // Display salary only if showSalary is true
                       Text(
                         (showSalary)
-                            ? "Rp ${formatCurrency(net_salary)}"
+                            ? "Rp ${formatCurrency(basic_salary)}"
                             : "********",
                         style: TextStyle(
                           fontFamily: 'Poppins',

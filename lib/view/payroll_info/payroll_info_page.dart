@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:shimmer/shimmer.dart';
 
 class PayrollInfo extends StatefulWidget {
   const PayrollInfo({super.key});
@@ -16,6 +17,11 @@ class PayrollInfo extends StatefulWidget {
 }
 
 class _PayrollInfoState extends State<PayrollInfo> {
+  var fullname;
+  var alamat;
+  var bank;
+  var rekening;
+
   Future? _loadData;
   TextStyle alertErrorTextStyle = TextStyle(
     fontFamily: 'Poppins',
@@ -24,6 +30,24 @@ class _PayrollInfoState extends State<PayrollInfo> {
     color: ColorsTheme.white,
   );
   @override
+  void initState() {
+    super.initState();
+    initData();
+  }
+
+  initConstructor() {
+    fullname = ''.obs;
+    alamat = ''.obs;
+    bank = ''.obs;
+    rekening = ''.obs;
+  }
+
+  initData() async {
+    setState(() {
+      _loadData = initializeState();
+    });
+  }
+
   Future refreshItem() async {
     setState(() {
       _loadData = initializeState();
@@ -40,8 +64,10 @@ class _PayrollInfoState extends State<PayrollInfo> {
     // print(result['details']['data']);
     AccountInformationModel accountModel =
         AccountInformationModel.fromJson(result['details']['data']);
-
-    print(accountModel);
+    fullname = accountModel.fullName;
+    alamat = accountModel.alamatKtp;
+    bank = accountModel.bank;
+    rekening = accountModel.nomorRekening;
   }
 
   Widget build(BuildContext context) {
@@ -87,7 +113,7 @@ class _PayrollInfoState extends State<PayrollInfo> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return contentBody(false);
         } else if (snapshot.hasError) {
-          SchedulerBinding.instance!.addPostFrameCallback((_) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
             var snackbar = SnackBar(
               content:
                   Text('Error: ${snapshot.error}', style: alertErrorTextStyle),
@@ -107,6 +133,51 @@ class _PayrollInfoState extends State<PayrollInfo> {
   }
 
   Widget contentBody(bool isLoaded) {
-    return Container();
+    return Container(
+      child: ListView(scrollDirection: Axis.vertical, children: [
+        listItems('Nama Lengkap', '$fullname', isLoaded),
+        listItems('Alamat', '$alamat', isLoaded),
+        listItems('Nama Bank', '$bank', isLoaded),
+        listItems('Nomor Rekening', '$rekening', isLoaded),
+      ]),
+    );
   }
+
+  Widget listItems(title, subtitle, isLoading) => Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 8.w),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              title,
+              style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 12.sp,
+                  color: ColorsTheme.darkGrey),
+            ),
+            SizedBox(height: 5.h),
+            (!isLoading)
+                ? Shimmer.fromColors(
+                    baseColor: ColorsTheme.secondary!,
+                    highlightColor: ColorsTheme.lightGrey2!,
+                    child: Container(
+                      width: 150.w,
+                      height: 15.h,
+                      margin: EdgeInsets.only(bottom: 3.h),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(3.r),
+                        color: ColorsTheme.white,
+                      ),
+                    ))
+                : Text(subtitle,
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 15.sp,
+                    )),
+            Divider(
+              height: 1.h,
+            )
+          ],
+        ),
+      );
 }

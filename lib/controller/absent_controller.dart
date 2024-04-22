@@ -51,7 +51,7 @@ class AbsentController extends GetxController {
     var absentData =
         await absentNetUtils.retriveAbsentData(token, userId, date);
     var result = ResponseHelper().jsonResponse(absentData);
-
+    print(date);
     if (result['status'] == 200) {
       final List<dynamic> jsonData = result['details'];
       return jsonData.map((data) {

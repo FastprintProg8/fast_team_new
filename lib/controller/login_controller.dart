@@ -3,6 +3,7 @@ import 'package:Fast_Team/server/network/employee_net_utils.dart';
 import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/helpers/response_helper.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginController extends GetxController {
   LoginNetUtils loginNetUtils = Get.put(LoginNetUtils());
@@ -35,7 +36,9 @@ class LoginController extends GetxController {
   }
 
   requestResetPassword(email) async {
-    var result = await loginNetUtils.requestResetPassword(email);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await loginNetUtils.requestResetPassword(token, email);
 
     return ResponseHelper().jsonResponse(result);
   }

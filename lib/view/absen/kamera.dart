@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class KameraPage extends StatefulWidget {
   @override
@@ -205,7 +206,7 @@ class KameraPageState extends State<KameraPage> {
       var resp_body = jsonDecode(resp);
       Navigator.pop(context); // Tutup popup loading
       if (resp_body['status'] == true) {
-        _controller.dispose();
+        // _controller.dispose();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -264,6 +265,8 @@ class KameraPageState extends State<KameraPage> {
   }
 
   Future<http.MultipartRequest> storeImageAbsent(File imageFile) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
     var request = http.MultipartRequest(
       'POST',
       Uri.parse('${BaseServer.serverUrl}/api_absensi/compare-image/'),
@@ -279,6 +282,9 @@ class KameraPageState extends State<KameraPage> {
       'base_64': await imageToBase64(imageFile),
       'note': note ?? '',
     });
+    request.headers.addAll({
+    HttpHeaders.authorizationHeader: 'Bearer $token',
+  });
     return request;
   }
 
