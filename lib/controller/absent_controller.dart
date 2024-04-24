@@ -51,35 +51,56 @@ class AbsentController extends GetxController {
     var absentData =
         await absentNetUtils.retriveAbsentData(token, userId, date);
     var result = ResponseHelper().jsonResponse(absentData);
-    print(date);
     if (result['status'] == 200) {
       final List<dynamic> jsonData = result['details'];
       return jsonData.map((data) {
-        final String rawTimeMasuk = data['clock_in']['jam_absen'];
-        DateTime? dateTimeMasuk;
+        List<dynamic> clock_in = data['clock_in'];
+        List<dynamic> clock_out = data['clock_out'];
+        // print(clock_out);
 
-        if (rawTimeMasuk != null &&
-            RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
-                .hasMatch(rawTimeMasuk)) {
-          dateTimeMasuk = DateTime.parse(rawTimeMasuk).toLocal();
-        }
+        clock_in.asMap().forEach((index, item) {
+          DateTime? dateTimeMasuk;
+          final String rawTimeMasuk = item['jam_absen'];
 
-        final String jamMasuk = dateTimeMasuk != null
-            ? DateFormat.Hm().format(dateTimeMasuk)
-            : '--:--';
+          if (rawTimeMasuk != null &&
+              RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+                  .hasMatch(rawTimeMasuk)) {
+            dateTimeMasuk = DateTime.parse(rawTimeMasuk).toLocal();
+          }
+          final String jamMasuk = dateTimeMasuk != null
+              ? DateFormat.Hm().format(dateTimeMasuk)
+              : '--:--';
+          clock_in[index]['jam_absen'] = jamMasuk;
+        });
 
-        final String rawTimeKeluar = data['clock_out']['jam_absen'];
-        DateTime? dateTimeKeluar;
+        clock_out.asMap().forEach((index, item) {
+          DateTime? dateTimeKeluar;
+          final String rawTimeKeluar = item['jam_absen'];
 
-        if (rawTimeKeluar != null &&
-            RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
-                .hasMatch(rawTimeKeluar)) {
-          dateTimeKeluar = DateTime.parse(rawTimeKeluar).toLocal();
-        }
+          if (rawTimeKeluar != null &&
+              RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+                  .hasMatch(rawTimeKeluar)) {
+            dateTimeKeluar = DateTime.parse(rawTimeKeluar).toLocal();
+          }
+          final String jamKeluar = dateTimeKeluar != null
+              ? DateFormat.Hm().format(dateTimeKeluar)
+              : '--:--';
+          clock_out[index]['jam_absen'] = jamKeluar;
+        });
+          // print(clock_out);
 
-        final String jamKeluar = dateTimeKeluar != null
-            ? DateFormat.Hm().format(dateTimeKeluar)
-            : '--:--';
+        // final String rawTimeKeluar = data['clock_out'][0]['jam_absen'];
+        // DateTime? dateTimeKeluar;
+
+        // if (rawTimeKeluar != null &&
+        //     RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+        //         .hasMatch(rawTimeKeluar)) {
+        //   dateTimeKeluar = DateTime.parse(rawTimeKeluar).toLocal();
+        // }
+
+        // final String jamKeluar = dateTimeKeluar != null
+        //     ? DateFormat.Hm().format(dateTimeKeluar)
+        //     : '--:--';
 
         final DateTime tanggal = DateTime.parse(data['tanggal']);
         final String dateText =
@@ -90,14 +111,14 @@ class AbsentController extends GetxController {
           'dateColor': tanggal.weekday == DateTime.sunday
               ? ColorsTheme.lightRed
               : ColorsTheme.black,
-          'id_masuk': data['clock_in']['id_absen'] != null
-              ? data['clock_in']['id_absen']
+          'id_masuk': data['clock_in'][0]['id_absen'] != null
+              ? data['clock_in'][0]['id_absen']
               : null,
-          'id_keluar': data['clock_out']['id_absen'] != null
-              ? data['clock_out']['id_absen']
+          'id_keluar': data['clock_out'][0]['id_absen'] != null
+              ? data['clock_out'][0]['id_absen']
               : null,
-          'jamMasuk': jamMasuk,
-          'jamKeluar': jamKeluar,
+          'jamMasuk': clock_in,
+          'jamKeluar': clock_out,
           'isSunday': tanggal.weekday == DateTime.sunday,
         };
       }).toList();

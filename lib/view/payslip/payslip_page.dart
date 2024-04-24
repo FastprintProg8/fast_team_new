@@ -280,37 +280,41 @@ class _PayslipPageState extends State<PayslipPage> {
     );
   }
   Widget _noNotifications() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Container(
-            width: 200, // Adjust width as needed
-            height: 200, // Adjust height as needed
-            decoration: BoxDecoration(
-              color: Colors.blue[100], // Adjust color as needed
-              borderRadius: BorderRadius.circular(
-                  100), // Half the height for an oval shape
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.update,
-                size: 100.0,
-                color: Colors.blue,
+    return Expanded(
+      child: ListView(
+          children: <Widget>[
+            Center(
+              child: Container(
+                width: 200, // Adjust width as needed
+                height: 200, // Adjust height as needed
+                decoration: BoxDecoration(
+                  color: Colors.blue[100], // Adjust color as needed
+                  borderRadius: BorderRadius.circular(
+                      100), // Half the height for an oval shape
+                ),
+                child: const Center(
+                  child: Icon(
+                    Icons.update,
+                    size: 100.0,
+                    color: Colors.blue,
+                  ),
+                ),
               ),
             ),
-          ),
-          const SizedBox(
-            height: 16.0,
-          ),
-          const Text(
-            'There is no data',
-            style: TextStyle(
-              fontSize: 18,
+            const SizedBox(
+              height: 16.0,
             ),
-          )
-        ],
-      ),
+            Center(
+              child: const Text(
+                'There is no data',
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            )
+          ],
+        ),
+      
     );
   }
   Widget _salarySlipCard(BuildContext context) {

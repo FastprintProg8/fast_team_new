@@ -2,7 +2,7 @@ import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/view/navigator_bottom_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:Fast_Team/controller/login_controller.dart';
-import 'package:Fast_Team/view/auth/reset_password_page.dart';
+import 'package:Fast_Team/view/auth/forgot_password_page.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -101,7 +101,7 @@ class _LoginPageState extends State<LoginPage> {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => const ResetPasswordPage(),
+                                builder: (context) => const ForgotPasswordPage(),
                               ));
                         },
                         child: const Text(
@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
           hintText: "Password",
           labelText: "Password",
         ),
-        keyboardType: TextInputType.text,
+        keyboardType: TextInputType.visiblePassword,
         obscureText: true,
       );
 

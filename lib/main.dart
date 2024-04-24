@@ -104,6 +104,8 @@ class _MyAppState extends State<MyApp> {
               '/verifPayslip': (context) => VerifPayslipPage(),
               '/listMember': (context) => ListAbsentPage(),
               '/milestone': (context) => MilestonePage(),
+              '/inbox': (context) => InboxPage(),
+              '/account': (context) => AccountPage(),
             },
           );
         });

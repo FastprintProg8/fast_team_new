@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
@@ -178,6 +179,27 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                 itemBuilder: (context, index) {
                   final employee = dataMember![index];
 
+                  final clockOut = !employee['jam_keluar'].isEmpty
+                      ? employee['jam_keluar'].last['jam_absen']
+                      : '00:00';
+                  print(clockOut);
+                  final clockIn = !employee['jam_masuk'].isEmpty
+                      ? employee['jam_masuk'][0]['jam_absen']
+                      : '00:00';
+
+                  String jamClockIn = '00:00';
+                  if (clockIn != '00:00') {
+                    DateTime dateTimeMasuk = DateTime.parse(clockIn).toLocal();
+                    jamClockIn = DateFormat.Hm().format(dateTimeMasuk).toString();
+                  }
+
+                  String jamClockOut = '00:00';
+                  if (clockOut != '00:00') {
+                    DateTime dateTimeKeluar = DateTime.parse(clockOut).toLocal();
+                    jamClockOut = DateFormat.Hm().format(dateTimeKeluar).toString();
+                  }
+                 
+
                   return Column(
                     children: [
                       Container(
@@ -216,9 +238,10 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                                         color: ColorsTheme.lightGreen,
                                       ),
                                       Text(
-                                        '${employee['clock_in']}',
+                                        ' ${jamClockIn}',
                                         style: TextStyle(
                                           fontSize: 15.sp,
+                                          color: jamClockIn == '00:00'? ColorsTheme.lightRed : ColorsTheme.black,
                                         ),
                                       ),
                                     ],
@@ -232,9 +255,10 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                                         color: ColorsTheme.lightYellow,
                                       ),
                                       Text(
-                                        '${employee['clock_out']}',
+                                        ' ${jamClockOut}',
                                         style: TextStyle(
                                           fontSize: 15.sp,
+                                          color: jamClockOut == '00:00'? ColorsTheme.lightRed : ColorsTheme.black,
                                         ),
                                       ),
                                     ],

@@ -2,26 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:Fast_Team/controller/login_controller.dart';
 import 'package:get/get.dart';
 
-class ResetPasswordPage extends StatefulWidget {
-  const ResetPasswordPage({Key? key}) : super(key: key);
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({Key? key}) : super(key: key);
 
   @override
-  State<ResetPasswordPage> createState() => _ResetPasswordPage();
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPage();
 }
 
-class _ResetPasswordPage extends State<ResetPasswordPage> {
+class _ForgotPasswordPage extends State<ForgotPasswordPage> {
 
   bool isLoading = false;
   
   LoginController? loginController;
-  TextEditingController? passwordInput;
-  TextEditingController? confirmPasswordInput;
+  TextEditingController? emailInput;
 
   @override
   void initState() {
     super.initState();
-    passwordInput = TextEditingController();
-    confirmPasswordInput = TextEditingController();
+    emailInput = TextEditingController();
     loginController = Get.put(LoginController());
   }
   
@@ -51,7 +49,6 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
           actions: <Widget>[
             TextButton(
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
                 Navigator.of(context).pop(); // Close the dialog
               },
               child: Text('OK'),
@@ -84,26 +81,22 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
           },
         )
       ),
-      body: SingleChildScrollView(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                const SizedBox(height: 70.0),
-                _logo(),
-                const SizedBox(height: 40.0),
-                _infoMessage(),
-                const SizedBox(height: 40.0),
-                _passwordField('Password', 'Enter your password', passwordInput!),
-                const SizedBox(height: 15.0),
-                _passwordField('Confirm Password', 'Enter your confirm password', confirmPasswordInput!),
-                const SizedBox(height: 16.0),
-                _buildButton(context, passwordInput!,confirmPasswordInput!, loginController!)
-              ]
-            ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              const SizedBox(height: 70.0),
+              _logo(),
+              const SizedBox(height: 40.0),
+              _infoMessage(),
+              const SizedBox(height: 40.0),
+              _emailField(),
+              const SizedBox(height: 16.0),
+              _buildButton(context, emailInput!, loginController!)
+            ]
           ),
         ),
       ),
@@ -111,32 +104,32 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
   }
 
   ElevatedButton _buildButton(BuildContext context, 
-      TextEditingController passwordInput,
-      TextEditingController confirmPasswordInput,
+      TextEditingController emailInput,
       LoginController controller) {
     
     requestResetPassword() async {
-        var result = await controller.requestChangePassword(passwordInput.text);
+        var result = await controller.requestResetPassword(emailInput.text);
         print(result);
         if (result['status'] == 200) {
-          showCustomDialog(context, 'Your password has changed');
+          showCustomDialog(context, 'Password reset instructions sent to your email.');
         } else if (result['status'] == 400){
-          showSnackBar('Failed to change your password', Colors.red);
+          String message = '';
+
+          if (result['details']['email'] is List) {
+            message = result['details']['email'][0];
+          } else {
+            message = result['details']['email'];
+          }
+          
+          showSnackBar(message, Colors.red);
         }
     }
 
     validateFromInput() async {
-      if(passwordInput.text.isEmpty) {
-        showSnackBar("Password cannot be empty", Colors.red);
-      }else if(confirmPasswordInput.text.isEmpty){
-        showSnackBar("Confirm password cannot be empty", Colors.red);
-      }
-       else {
-        if(passwordInput.text != confirmPasswordInput.text){
-          showSnackBar("Your new password and confirm password must match", Colors.red);
-        }else{
-          await requestResetPassword();
-        }
+      if(emailInput.text.isEmpty) {
+        showSnackBar("Email cannot be empty", Colors.red);
+      } else {
+        await requestResetPassword();
       }
       setState(() {
         isLoading = false;
@@ -174,24 +167,22 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
     );
   }
 
-  TextFormField _passwordField(String label, String hint, TextEditingController cntrl) {
+  TextFormField _emailField() {
     return TextFormField(
-      controller: cntrl,
-      decoration: InputDecoration(
+      controller: emailInput,
+      decoration: const InputDecoration(
         border: OutlineInputBorder(),
-        prefixIcon: Icon(Icons.lock),
-        hintText: hint,
-        labelText: label,
+        prefixIcon: Icon(Icons.email),
+        hintText: "Email",
+        labelText: "Email",
       ),
-      keyboardType: TextInputType.visiblePassword,
-      obscureText: true,
+      keyboardType: TextInputType.emailAddress,
     );
   }
-}
 
   Text _infoMessage() {
     return Text(
-      'Make Sure You Remember Your Password',
+      'Please Enter Your Email Address To Recieve Verification Message',
       textAlign: TextAlign.center,
       style: TextStyle(
         fontSize: 18,
@@ -207,3 +198,4 @@ class _ResetPasswordPage extends State<ResetPasswordPage> {
       child: Image.asset('assets/img/logo.png'),
     );
   }
+}

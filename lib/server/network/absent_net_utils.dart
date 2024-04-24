@@ -30,7 +30,7 @@ class AbsentNetUtils {
     var response = await http
         .get(Uri.parse(path), headers: headers)
         .timeout(BaseServer.durationlimit);
-
+    
     return response;
   }
 
@@ -62,7 +62,7 @@ class AbsentNetUtils {
 
   retriveUserAbsenDateDevisi(token, tanggal, idDivisi) async {
     var path =
-        '${BaseServer.serverUrl}/api_absensi/user-absen/${tanggal}/${idDivisi}';
+        '${BaseServer.serverUrl}/api_absensi/user-absen/${tanggal}/${idDivisi}/';
     Map<String, String> headers = {
       'Content-Type': 'application/json',
       'Authorization': 'Bearer $token',

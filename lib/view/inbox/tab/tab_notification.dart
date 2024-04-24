@@ -180,7 +180,14 @@ class _TabNotificationPageState extends State<TabNotificationPage>
               ? ListView(
                   children: [_notificationList()],
                 )
-              : _noNotifications(),
+              : ListView(
+                  children: [
+                    SizedBox(
+                        height: 0.5 * MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).padding.top,
+                        child: _noNotifications()),
+                  ],
+                ),
     );
   }
 

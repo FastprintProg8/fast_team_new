@@ -22,6 +22,7 @@ class _InboxPageState extends State<InboxPage> {
       child: Scaffold(
         appBar: AppBar(
           title: Text('Inbox'),
+          automaticallyImplyLeading: false,
           bottom: TabBar(
             labelColor: Colors.blue[900],
             unselectedLabelColor: Colors.black,

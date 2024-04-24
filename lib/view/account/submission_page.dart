@@ -174,34 +174,39 @@ class _SubmissionPageState extends State<SubmissionPage> {
   }
 
   Widget _noData() {
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 100.h),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+    return Expanded(
+      child: ListView(
         children: <Widget>[
-          Container(
-            width: 200, // Adjust width as needed
-            height: 200, // Adjust height as needed
-            decoration: BoxDecoration(
-              color: Colors.blue[100], // Adjust color as needed
-              borderRadius: BorderRadius.circular(
-                  100), // Half the height for an oval shape
-            ),
-            child: const Center(
-              child: Icon(
-                Icons.update,
-                size: 100.0,
-                color: Colors.blue,
+          SizedBox(
+            height: 100.w,
+          ),
+          Center(
+            child: Container(
+              width: 200, // Adjust width as needed
+              height: 200, // Adjust height as needed
+              decoration: BoxDecoration(
+                color: Colors.blue[100], // Adjust color as needed
+                borderRadius: BorderRadius.circular(
+                    100), // Half the height for an oval shape
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.update,
+                  size: 100.0,
+                  color: Colors.blue,
+                ),
               ),
             ),
           ),
           const SizedBox(
             height: 16.0,
           ),
-          const Text(
-            'There is no data',
-            style: TextStyle(
-              fontSize: 18,
+          Center(
+            child: const Text(
+              'There is no data',
+              style: TextStyle(
+                fontSize: 18,
+              ),
             ),
           )
         ],

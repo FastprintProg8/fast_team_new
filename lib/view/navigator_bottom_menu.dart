@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/view/account/account_page.dart';
 import 'package:Fast_Team/view/employee/employee_page.dart';
 import 'package:Fast_Team/view/inbox/inbox_page.dart';
 import 'package:Fast_Team/view/request/schedule_request_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 
@@ -21,52 +24,75 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
   static const backPressedDuration = Duration(seconds: 2);
   var selectedIndex = 0.obs;
   var data = false.obs;
-
+  Map<String, dynamic>? args;
+  List<dynamic> notMainMenu = [{'data': 0}];
   @override
   moveToMenu(index) async {
-    // await Future.delayed(const Duration(milliseconds: 500));
+    args = null;
     selectedIndex.value = index;
   }
 
-  Future<bool> onBackPressed() async {
-    final now = DateTime.now();
-
+  Future<void> onBackPressed() async {
+    DateTime now = DateTime.now();
     if (currentBackPressedTime == null ||
-        now.difference(currentBackPressedTime!) > backPressedDuration) {
+        now.difference(currentBackPressedTime!) > const Duration(seconds: 2)) {
+      //add duration of press gap
       currentBackPressedTime = now;
-
-      var snackbar = const SnackBar(
-        content: Text("Tekan sekali lagi untuk keluar..."),
-        behavior: SnackBarBehavior.floating,
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackbar);
-
+      ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Tekan sekali lagi untuk keluar...")));
       return Future.value(false);
+    } else {
+      SystemNavigator.pop();
+      exit(0);
     }
-    return Future.value(true);
   }
 
   Widget build(BuildContext context) {
+    args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
+    if (notMainMenu.length == 1 && args != null) {
+      setState(() {
+        notMainMenu.add(args);
+        selectedIndex.value = args!['key'];
+      });
+    }
+
     Widget navigationMenu() {
       return Obx(
-        () => WillPopScope(
-          // child:HomePage(),
-          child: (selectedIndex.value == 0)
-              ? HomePage()
-              : (selectedIndex.value == 1)
-                  ? EmployeePage()
-                  : (selectedIndex.value == 3)
-                      ? InboxPage()
-                      : (selectedIndex.value == 2)
-                          ? ScheduleRequestPage()
-                          : AccountPage(),
-          onWillPop: onBackPressed,
-        ),
+        () {
+          var willPopScope2 = WillPopScope(
+            // child:HomePage(),
+            child: (selectedIndex.value == 0)
+                ? HomePage()
+                : (selectedIndex.value == 1)
+                    ? EmployeePage()
+                    : (selectedIndex.value == 3)
+                        ? InboxPage()
+                        : (selectedIndex.value == 2)
+                            ? ScheduleRequestPage()
+                            : AccountPage(),
+            onWillPop: () async {
+              DateTime now = DateTime.now();
+              if (currentBackPressedTime == null ||
+                  now.difference(currentBackPressedTime!) >
+                      const Duration(seconds: 2)) {
+                //add duration of press gap
+                currentBackPressedTime = now;
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text("Tekan sekali lagi untuk keluar...")));
+                return Future.value(false);
+              } else {
+                SystemNavigator.pop();
+                exit(0);
+              }
+            },
+          );
+          var willPopScope = willPopScope2;
+          return willPopScope;
+        },
       );
     }
 
-    Widget itemNavigation() => 
-        NavigationBarTheme(
+    Widget itemNavigation() => NavigationBarTheme(
           data: NavigationBarThemeData(),
           child: NavigationBar(
             height: 50.w,
@@ -74,6 +100,7 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
             selectedIndex: selectedIndex.value,
             onDestinationSelected: (index) => setState(() {
               moveToMenu(index);
+              
             }),
             destinations: [
               NavigationDestination(
@@ -98,13 +125,6 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
               ),
             ],
           ),
-          // onTap: (index) => setState(() {
-          //   moveToMenu(index);
-          // }),
-          // currentIndex: selectedIndex.value,
-          // type: BottomNavigationBarType.fixed,
-          // selectedItemColor: ColorsTheme.primary,
-          // items: [],
         );
 
     return Scaffold(

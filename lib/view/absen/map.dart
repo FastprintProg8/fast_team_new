@@ -100,7 +100,7 @@ class _MapPageState extends State<MapPage> {
     final String imgProfLastPart = imgProfParts.isNotEmpty
         ? imgProfParts.last
         : ''; // Mengambil bagian terakhir, atau string kosong jika tidak ada bagian
-    Navigator.pushNamed(context, '/kamera', arguments: {
+    Navigator.pushReplacementNamed(context, '/kamera', arguments: {
       'idUser': idUser,
       'long': _longitude,
       'lat': _latitude,

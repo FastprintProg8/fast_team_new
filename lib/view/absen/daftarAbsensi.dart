@@ -1,6 +1,9 @@
 import 'package:Fast_Team/controller/absent_controller.dart';
+import 'package:Fast_Team/style/color_theme.dart';
+import 'package:Fast_Team/widget/bottom_nav_bar.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -30,6 +33,7 @@ class DaftarAbsensiPage extends StatefulWidget {
 class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
   DateTime _selectedDate = DateTime.now();
   List<Map<String, dynamic>> _data = [];
+  Future? _loadData;
   int userId = 0;
   int absenCount = 0;
   int lateClockInCount = 0;
@@ -39,16 +43,32 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
 
   AbsentController? absentController;
 
+  TextStyle alertErrorTextStyle = TextStyle(
+    fontFamily: 'Poppins',
+    fontSize: 12.sp,
+    fontWeight: FontWeight.w400,
+    color: ColorsTheme.white,
+  );
+
   @override
   void initState() {
     super.initState();
-    _loadUserId().then((_) {
-      _loadDataForSelectedMonth();
+    // _loadUserId().then((_) {
+    //   _loadDataForSelectedMonth();
+    // });
+    initData();
+  }
+
+  initData() async {
+    setState(() {
+      _loadData = _loadDataForSelectedMonth();
     });
   }
 
   Future refreshItem() async {
-    await _loadDataForSelectedMonth();
+    setState(() {
+      _loadData = _loadDataForSelectedMonth();
+    });
   }
 
   Future<void> _loadUserId() async {
@@ -60,7 +80,6 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
     absentController = Get.put(AbsentController());
 
     final data = await absentController!.retriveAbsentData(_selectedDate);
-    // print(data);
     final totalData = await absentController!.retriveTotalData(_selectedDate);
     setState(() {
       _data = data;
@@ -82,7 +101,6 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
-        
         });
         await _loadDataForSelectedMonth();
       }
@@ -137,54 +155,80 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
               Navigator.pop(context, 'true');
             },
           )),
-      body: Column(
-        children: [
-          SizedBox(height: 20.0),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 15.w),
-            child: TextButton(
-              onPressed: () {
-                _selectMonth(context);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
-                backgroundColor: Colors.transparent,
-                side: BorderSide(color: Colors.black, width: 1.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5.w),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.calendar_today,
-                          size: 24,
-                        ),
-                        SizedBox(width: 8.0),
-                        Text(
-                          formattedDate,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.normal),
-                        ),
-                      ],
-                    ),
+      body: FutureBuilder(
+          future: _loadData,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              SchedulerBinding.instance!.addPostFrameCallback((_) {
+                var snackbar = SnackBar(
+                  content: Text('Error: ${snapshot.error}',
+                      style: alertErrorTextStyle),
+                  backgroundColor: ColorsTheme.lightRed,
+                  behavior: SnackBarBehavior.floating,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackbar);
+              });
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasData) {
+              return _body(context, formattedDate, daysInMonth);
+            } else {
+              return _body(context, formattedDate, daysInMonth);
+            }
+          }),
+      bottomNavigationBar: bottomNavBar(context: context),
+    );
+  }
+
+  Widget _body(BuildContext context, String formattedDate, int daysInMonth) {
+    return Column(
+      children: [
+        SizedBox(height: 20.0),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 15.w),
+          child: TextButton(
+            onPressed: () {
+              _selectMonth(context);
+            },
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              backgroundColor: Colors.transparent,
+              side: BorderSide(color: Colors.black, width: 1.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5.w),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(
+                        Icons.calendar_today,
+                        size: 24,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text(
+                        formattedDate,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.normal),
+                      ),
+                    ],
                   ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    size: 24,
-                  ),
-                ],
-              ),
+                ),
+                Icon(
+                  Icons.arrow_drop_down,
+                  size: 24,
+                ),
+              ],
             ),
           ),
-          SizedBox(height: 5.w),
-          cardAbsentInfo(context),
-          SizedBox(height: 5.0),
-          ListAbsent(daysInMonth),
-        ],
-      ),
+        ),
+        SizedBox(height: 5.w),
+        cardAbsentInfo(context),
+        SizedBox(height: 5.0),
+        ListAbsent(daysInMonth),
+      ],
     );
   }
 
@@ -199,7 +243,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
           itemBuilder: (BuildContext context, int index) {
             final Map<String, dynamic> item =
                 _data.isNotEmpty ? _data[index] : {};
-                
+
             String tanggal = (index + 1).toString();
             bool isSunday = item['isSunday'] ?? false;
             Color dateColor =
@@ -212,8 +256,9 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
             return AbsensiListItem(
               dateText: dateText,
               dateColor: dateColor,
-              jamMasuk: item['jamMasuk'] ?? '--:--',
-              jamKeluar: item['jamKeluar'] ?? '--:--',
+              jamMasuk: item['jamMasuk'] ?? [],
+              // jamMasuk: '--:--',
+              jamKeluar: item['jamKeluar'] ?? [],
               idMasuk: item['id_masuk'] ?? 0,
               idKeluar: item['id_keluar'] ?? 0,
               isSunday: isSunday,
@@ -270,11 +315,13 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
   }
 }
 
+
+
 class AbsensiListItem extends StatefulWidget {
   final String dateText;
   final Color dateColor;
-  final String jamMasuk;
-  final String jamKeluar;
+  final List<dynamic> jamMasuk;
+  final List<dynamic> jamKeluar;
   final int idMasuk;
   final int idKeluar;
   final bool isSunday;
@@ -296,8 +343,11 @@ class AbsensiListItem extends StatefulWidget {
 class _AbsensiListItemState extends State<AbsensiListItem> {
   bool isExpanded = false;
 
+  // get jamMasukItem => null;
   @override
   Widget build(BuildContext context) {
+    dynamic lastJamKeluar =
+        widget.jamKeluar.isNotEmpty ? widget.jamKeluar.last : null;
     return Container(
       color: widget.isSunday ? Colors.grey[200] : Colors.white,
       child: Column(
@@ -325,7 +375,9 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                       padding: EdgeInsets.only(
                           right: 10), // Jeda 10px di antara kedua teks
                       child: Text(
-                        widget.jamMasuk,
+                        (widget.jamMasuk.isEmpty)
+                            ? '--:--'
+                            : widget.jamMasuk[0]['jam_absen'],
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -333,7 +385,9 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                       ),
                     ),
                     Text(
-                      widget.jamKeluar,
+                      (widget.jamMasuk.isEmpty)
+                          ? '--:--'
+                          : lastJamKeluar['jam_absen'],
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -375,55 +429,89 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                 children: <Widget>[
                   Divider(), // Divider added here
                   SizedBox(height: 5),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/detailAbsensi',
-                          arguments: widget.idMasuk);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Jam Masuk:',
-                          style: TextStyle(fontSize: 14),
+                  ...widget.jamMasuk.map((jamMasukItem) {
+                    return Column(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/detailAbsensi',
+                                arguments: jamMasukItem['id_absen']);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Jam Masuk:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: ColorsTheme.lightGreen,
+                                  fontWeight: FontWeight.w900
+                                ),
+                              ),
+                              Text(
+                                (jamMasukItem['jam_absen'] == null)
+                                    ? '--:--'
+                                    : jamMasukItem['jam_absen'],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: ColorsTheme.lightGreen,
+                                  fontWeight: FontWeight.w900
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_right_rounded,
+                                size: 24,
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          widget.jamMasuk,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(
-                          Icons.arrow_right_rounded,
-                          size: 24,
-                        ),
+                        SizedBox(height: 5),
+                        Divider(), // Divider added here
                       ],
-                    ),
-                  ),
+                    );
+                  }).toList(),
                   SizedBox(height: 5),
-                  Divider(), // Divider added here
-                  SizedBox(height: 5),
-                  InkWell(
-                    onTap: () {
-                      Navigator.pushNamed(context, '/detailAbsensi',
-                          arguments: widget.idKeluar);
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          'Jam Keluar:',
-                          style: TextStyle(fontSize: 14),
+                  ...widget.jamKeluar.map((jamKeluarItem) {
+                    return Column(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Navigator.pushNamed(context, '/detailAbsensi',
+                                arguments: jamKeluarItem['id_absen']);
+                          },
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(
+                                'Jam Keluar:',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: ColorsTheme.lightYellow,
+                                  fontWeight: FontWeight.w900
+                                ),
+                              ),
+                              Text(
+                                (jamKeluarItem['jam_absen'] == null)
+                                    ? '--:--'
+                                    : jamKeluarItem['jam_absen'],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: ColorsTheme.lightYellow,
+                                  fontWeight: FontWeight.w900
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_right_rounded,
+                                size: 24,
+                              ),
+                            ],
+                          ),
                         ),
-                        Text(
-                          widget.jamKeluar,
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Icon(
-                          Icons.arrow_right_rounded,
-                          size: 24,
-                        ),
+                        SizedBox(height: 5),
+                        Divider(), // Divider added here
                       ],
-                    ),
-                  ),
+                    );
+                  }).toList(),
                   SizedBox(height: 10),
                 ],
               ),

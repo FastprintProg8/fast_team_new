@@ -207,7 +207,7 @@ class KameraPageState extends State<KameraPage> {
       Navigator.pop(context); // Tutup popup loading
       if (resp_body['status'] == true) {
         // _controller.dispose();
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (context) => ResultScreen(
@@ -423,7 +423,7 @@ class ResultScreen extends StatelessWidget {
                     children: [
                       ElevatedButton(
                         onPressed: () {
-                          Navigator.pushNamed(context, '/navigation');
+                          Navigator.pushReplacementNamed(context, '/navigation');
                         },
                         style: ElevatedButton.styleFrom(
                           minimumSize: Size(double.infinity, 50),
@@ -435,7 +435,7 @@ class ResultScreen extends StatelessWidget {
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.pushNamed(context, '/daftarAbsensi');
+                            Navigator.pushReplacementNamed(context, '/daftarAbsensi');
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,

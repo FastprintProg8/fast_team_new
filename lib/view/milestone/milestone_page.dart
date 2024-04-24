@@ -1,6 +1,7 @@
 import 'package:Fast_Team/controller/milestone_controller.dart';
 import 'package:Fast_Team/server/network/job_net_utils.dart';
 import 'package:Fast_Team/style/color_theme.dart';
+import 'package:Fast_Team/widget/bottom_nav_bar.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -106,6 +107,7 @@ class _MilestonePageState extends State<MilestonePage> {
                   );
                 }),
       ),
+      bottomNavigationBar: bottomNavBar(context: context),
     );
   }
 
