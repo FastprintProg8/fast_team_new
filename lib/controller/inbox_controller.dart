@@ -1,42 +1,55 @@
 import 'package:Fast_Team/server/network/inbox_net_utils.dart';
 import 'package:Fast_Team/helpers/response_helper.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class InboxController {
   InboxNetUtils inboxNetUtils = Get.put(InboxNetUtils());
 
   retrieveAttendanceList(userId) async {
-    var result = await inboxNetUtils.retrieveAttendanceList(userId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await inboxNetUtils.retrieveAttendanceList(userId, token);
 
     return ResponseHelper().jsonResponse(result);
   }
 
   retrieveOvertimeList(userId) async {
-    var result = await inboxNetUtils.retrieveOvertimeList(userId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await inboxNetUtils.retrieveOvertimeList(userId, token);
 
     return ResponseHelper().jsonResponse(result);
   }
 
   retrieveLeaveList(userId) async {
-    var result = await inboxNetUtils.retrieveLeaveList(userId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await inboxNetUtils.retrieveLeaveList(userId, token);
 
     return ResponseHelper().jsonResponse(result);
   }
 
   retrieveNotificationList(userId) async {
-    var result = await inboxNetUtils.retrieveNotificationList(userId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await inboxNetUtils.retrieveNotificationList(userId, token);
 
     return ResponseHelper().jsonResponse(result);
   }
 
   retrieveNotificationDetail(notifId) async {
-    var result = await inboxNetUtils.retrieveNotificationDetail(notifId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await inboxNetUtils.retrieveNotificationDetail(notifId, token);
 
     return ResponseHelper().jsonResponse(result);
   }
 
   requestReadAllNotification(userId) async {
-    var result = await inboxNetUtils.requestReadAllNotification(userId);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await inboxNetUtils.requestReadAllNotification(userId, token);
 
     return ResponseHelper().jsonResponse(result);
   }

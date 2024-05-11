@@ -71,7 +71,7 @@ class _PayslipPageState extends State<PayslipPage> {
     posisi = "".obs;
     imgUrl = "".obs;
     id_payroll = "".obs;
-
+    
     setState(() {
       _fetchData = initData();
     });
@@ -87,7 +87,6 @@ class _PayslipPageState extends State<PayslipPage> {
     var salaryResult = await payrollController.retrivePayroll(formattedDate);
     var salaryDetail = await payrollController
         .retriveDetailPayroll(salaryResult['details']['id']);
-    // print(salaryResult);
     setState(() {
       id_account = accountModel.id;
       nama = accountModel.fullName;
@@ -101,7 +100,7 @@ class _PayslipPageState extends State<PayslipPage> {
       deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
       allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
     });
-    // print(salaryResult);
+    
   }
 
   int calculateTotalDeductionAmount(List<dynamic> data, type) {
@@ -159,7 +158,6 @@ class _PayslipPageState extends State<PayslipPage> {
   @override
   Widget build(BuildContext context) {
     String formattedDate = DateFormat.yMMMM().format(_selectedDate);
-
     Widget _body() {
       return FutureBuilder(
           future: _fetchData,
@@ -707,16 +705,16 @@ class _PayslipPageState extends State<PayslipPage> {
               margin: EdgeInsets.only(bottom: 10.w),
               child: Row(
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: '$imgUrl',
-                    imageBuilder: (context, imageProvider) => ClipRRect(
-                      borderRadius: BorderRadius.circular(30.r),
-                      child: CircleAvatar(
-                        radius: 30.r,
-                        backgroundImage: imageProvider,
-                      ),
-                    ),
-                  ),
+                  // CachedNetworkImage(
+                  //   imageUrl: '$imgUrl',
+                  //   imageBuilder: (context, imageProvider) => ClipRRect(
+                  //     borderRadius: BorderRadius.circular(30.r),
+                  //     child: CircleAvatar(
+                  //       radius: 30.r,
+                  //       backgroundImage: imageProvider,
+                  //     ),
+                  //   ),
+                  // ),
                   SizedBox(
                     width: 10.w,
                   ),

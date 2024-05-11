@@ -60,7 +60,7 @@ class _RequestPageState extends State<RequestPage> {
   }
 
   Future<void> fetchAcaraOptions() async {
-    final url = Uri.parse('http://103.29.214.154:9002/api/cuti/opsi/');
+    final url = Uri.parse('http://103.29.214.154:9002/api_absensi/cuti/opsi/');
 
     try {
       final response = await http.get(url);
@@ -384,7 +384,7 @@ class _RequestPageState extends State<RequestPage> {
                                     element['name'] == ijinType)['id'];
 
                             Uri apiUrl = Uri.parse(
-                                'http://103.29.214.154:9002/api/cuti/');
+                                'http://103.29.214.154:9002/api_absensi/cuti/');
                             var request = http.MultipartRequest('POST', apiUrl);
                             request.headers['Content-Type'] =
                                 'application/json';
@@ -456,7 +456,7 @@ class _RequestPageState extends State<RequestPage> {
 
                             // Buat permintaan dengan metode POST ke endpoint lembur
                             Uri apiUrl = Uri.parse(
-                                'http://103.29.214.154:9002/api/lembur/');
+                                'http://103.29.214.154:9002/api_absensi/lembur/');
                             Map<String, String> headers = {
                               'Content-Type': 'application/json',
                             };

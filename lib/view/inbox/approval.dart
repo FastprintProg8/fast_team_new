@@ -29,8 +29,8 @@ class _ApprovalPageState extends State<ApprovalPage> {
     int userId = sharedPreferences.getInt('user-id_user') ?? 0;
     String arguments = ModalRoute.of(context)!.settings.arguments as String;
 
-    String apiUrl = 'http://103.29.214.154:9002/api/$arguments/list/$userId/';
-
+    String apiUrl = 'http://103.29.214.154:9002/api_absensi/$arguments/list/$userId/';
+    
     try {
       final response = await http.get(Uri.parse(apiUrl));
       if (response.statusCode == 200) {

@@ -281,7 +281,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 final response =
                                                     await http.post(
                                                   Uri.parse(
-                                                      'http://103.29.214.154:9002/api/user/reset_password/'),
+                                                      'http://103.29.214.154:9002/api_absensi/user/reset_password/'),
                                                   body: requestData,
                                                 );
                                                 print(response);

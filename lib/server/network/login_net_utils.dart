@@ -27,7 +27,7 @@ class LoginNetUtils {
     };
 
     var response = await http.post(
-      Uri.parse("${BaseServer.serverUrl}/api/user/reset_password/"),
+      Uri.parse("${BaseServer.serverUrl}/api_absensi/user/reset_password/"),
       body: bodyParams,
       // headers: {
       //   "Authorization": "Bearer $token",

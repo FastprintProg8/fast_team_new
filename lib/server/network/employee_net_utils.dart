@@ -41,7 +41,7 @@ class EmployeeNetUtils {
   }
 
   retrieveEmployeeBank() async {
-    var url = "${BaseServer.serverUrl}/api/bank/";
+    var url = "${BaseServer.serverUrl}/api_absensi/bank/";
     var response =
         await http.get(Uri.parse(url)).timeout(BaseServer.durationlimit);
     return response;

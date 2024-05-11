@@ -50,6 +50,7 @@ class _LeavePageState extends State<LeavePage>
     var result = await scheduleRequestController!.retrieveLeaveOption();
     if (result['status'] == 200) {
       List<dynamic> data = result['details'];
+     
       List<Map<String, dynamic>> optionList = [];
       for (var item in data) {
         optionList.add({
@@ -64,6 +65,7 @@ class _LeavePageState extends State<LeavePage>
             .map<String>((item) => item['name'].toString())
             .toList();
       });
+       
     }
   }
 
@@ -117,7 +119,6 @@ class _LeavePageState extends State<LeavePage>
   @override
   Widget build(BuildContext context) {
     super.build(context);
-
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(

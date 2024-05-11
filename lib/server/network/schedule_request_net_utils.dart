@@ -1,52 +1,58 @@
 import 'package:Fast_Team/server/base_server.dart';
 import 'package:http/http.dart' as http;
-import 'dart:io'; 
+import 'dart:io';
 import 'package:http_parser/http_parser.dart';
 
 class ScheduleRequestNetUtils {
-
-  retrieveLeaveOption() async {
-    
+  retrieveLeaveOption(token) async {
+    Map<String, String> headers = {
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
     var response = await http
-      .get(
-        Uri.parse("${BaseServer.serverUrl}/api/cuti/opsi/")
-      )
-      .timeout(BaseServer.durationlimit);
+        .get(Uri.parse("${BaseServer.serverUrl}/api_absensi/cuti/opsi/"),
+            headers: headers)
+        .timeout(BaseServer.durationlimit);
 
     return response;
   }
 
-  insertAbsentSubmission(Map<String, dynamic> bodyParams) async {
-    print(bodyParams);
+  insertAbsentSubmission(Map<String, dynamic> bodyParams, var token) async {
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+    };
     var response = await http
-      .post(
-        Uri.parse("${BaseServer.serverUrl}/api_absensi/user-pengajuanAbsensi/"),
-        body: bodyParams,
-      )
-      .timeout(BaseServer.durationlimit);
+        .post(
+          Uri.parse(
+              "${BaseServer.serverUrl}/api_absensi/user-pengajuanAbsensi/"),
+          headers: headers,
+          body: bodyParams,
+        )
+        .timeout(BaseServer.durationlimit);
 
     return response;
   }
 
-   insertOvertimeSubmission(Map<String, dynamic> bodyParams) async {
-    
+  insertOvertimeSubmission(Map<String, dynamic> bodyParams, var token) async {
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+    };
     var response = await http
-      .post(
-        Uri.parse("${BaseServer.serverUrl}/api/lembur/"),
-        body: bodyParams,
-      )
-      .timeout(BaseServer.durationlimit);
+        .post(
+          Uri.parse("${BaseServer.serverUrl}/api_absensi/lembur/"),
+          headers: headers,
+          body: bodyParams,
+        )
+        .timeout(BaseServer.durationlimit);
 
     return response;
   }
 
   insertLeaveSubmission(Map<String, dynamic> bodyParams, file) async {
-    
-    var response = http
-      .MultipartRequest(
-        'POST',
-        Uri.parse("${BaseServer.serverUrl}/api/cuti/"),
-      );
+    var response = http.MultipartRequest(
+      'POST',
+      Uri.parse("${BaseServer.serverUrl}/api_absensi/cuti/"),
+    );
 
     response.headers['Content-Type'] = 'application/json';
     response.fields['user'] = bodyParams['userId'];
@@ -61,7 +67,8 @@ class ScheduleRequestNetUtils {
         file!.readAsBytes().asStream(),
         file!.lengthSync(),
         filename: 'image.jpg', // Nama file yang sesuai
-        contentType: MediaType('image', 'jpeg'), // Sesuaikan dengan jenis gambar yang diunggah
+        contentType: MediaType(
+            'image', 'jpeg'), // Sesuaikan dengan jenis gambar yang diunggah
       );
       response.files.add(multipartFile);
     }
