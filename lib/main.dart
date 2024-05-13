@@ -24,15 +24,10 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:month_year_picker/month_year_picker.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:animated_splash_screen/animated_splash_screen.dart';
-
 import 'view/absen/absensi.dart';
 import 'view/history.dart';
 import 'view/home.dart';
 import 'view/absen/map.dart';
-import 'view/request/request.dart';
 
 void main() async {
   WidgetsFlutterBinding
@@ -55,7 +50,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  static GlobalKey<NavigatorState> navKey = GlobalKey<NavigatorState>();
   static const Color navyBlue =
       Color.fromARGB(255, 2, 65, 128); // Nilai warna biru navy
 
@@ -66,7 +60,7 @@ class _MyAppState extends State<MyApp> {
         minTextAdapt: true,
         builder: (_, child) {
           return MaterialApp(
-            localizationsDelegates: [
+            localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
               MonthYearPickerLocalizations.delegate,
             ],
@@ -81,31 +75,32 @@ class _MyAppState extends State<MyApp> {
             home: const SplashScreen(), // Set rute awal ke '/splash'
             routes: {
               // '/': (context) => SplashScreen(),
-              '/login': (context) => LoginPage(),
-              '/navigation': (context) => NavigatorBottomMenu(),
-              '/home': (context) => HomePage(),
-              '/map': (context) => MapPage(),
-              '/kamera': (context) => KameraPage(),
+              '/login': (context) => const LoginPage(),
+              '/navigation': (context) => const NavigatorBottomMenu(),
+              '/home': (context) => const HomePage(),
+              '/map': (context) => const MapPage(),
+              '/kamera': (context) => const KameraPage(),
               '/absensi': (context) => AbsensiPage(),
-              '/detailAbsensi': (context) => DetailAbsensiPage(),
-              '/daftarAbsensi': (context) => DaftarAbsensiPage(),
-              '/profile': (context) => AccountPage(),
-              '/request': (context) => ScheduleRequestPage(),
+              '/detailAbsensi': (context) => const DetailAbsensiPage(),
+              '/daftarAbsensi': (context) => const DaftarAbsensiPage(),
+              '/profile': (context) => const AccountPage(),
+              '/request': (context) => const ScheduleRequestPage(),
               '/daftarKehadiran': (context) => DaftarKehadiranPage(),
               '/history': (context) => History(),
               '/employee': (context) => EmployeePage(),
-              '/inbox': (context) => InboxPage(),
+              '/inbox': (context) => const InboxPage(),
               '/approval': (context) => ApprovalPage(),
-              '/sertificate': (context) => SertificatePage(),
-              '/attendenceDetail': (context) => AttendanceDetailPage(),
-              '/leaveDetail': (context) => LeaveDetailPage(),
-              '/overtimeDetail': (context) => OvertimeDetailPage(),
-              '/payslip': (context) => PayslipPage(),
-              '/verifPayslip': (context) => VerifPayslipPage(),
-              '/listMember': (context) => ListAbsentPage(),
-              '/milestone': (context) => MilestonePage(),
-              '/inbox': (context) => InboxPage(),
-              '/account': (context) => AccountPage(),
+              '/sertificate': (context) => const SertificatePage(),
+              '/attendenceDetail': (context) => const AttendanceDetailPage(),
+              '/leaveDetail': (context) => const LeaveDetailPage(),
+              '/overtimeDetail': (context) => const OvertimeDetailPage(),
+              '/payslip': (context) => const PayslipPage(),
+              '/verifPayslip': (context) => const VerifPayslipPage(),
+              '/listMember': (context) => const ListAbsentPage(),
+              '/milestone': (context) => const MilestonePage(),
+              // ignore: equal_keys_in_map
+              '/inbox': (context) => const InboxPage(),
+              '/account': (context) => const AccountPage(),
             },
           );
         });
@@ -115,7 +110,7 @@ class _MyAppState extends State<MyApp> {
   MaterialColor get navyBlueSwatch {
     return MaterialColor(
       navyBlue.value,
-      <int, Color>{
+      const <int, Color>{
         50: navyBlue,
         100: navyBlue,
         200: navyBlue,

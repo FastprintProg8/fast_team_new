@@ -182,7 +182,7 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _body(false);
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
                   content: Text('Error: ${snapshot.error}',
                       style: alertErrorTextStyle),
@@ -205,7 +205,7 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
     return RefreshWidget(
       onRefresh: refreshItem,
       child: (!isLoading)
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : (overtimeList.isNotEmpty)?ListView.builder(
               itemCount: overtimeList.length,
               shrinkWrap: true,
@@ -254,27 +254,14 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
   }
 
   Widget _buildFilter() {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 10.w, bottom: 20.w),
-            child: Center(
-              child: Text(
-                "Filter",
-                style: TextStyle(
-                  color: ColorsTheme.black,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 10.w, bottom: 20.w),
+          child: Center(
             child: Text(
-              "Status",
+              "Filter",
               style: TextStyle(
                 color: ColorsTheme.black,
                 fontSize: 20.sp,
@@ -282,149 +269,160 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
               ),
             ),
           ),
-          SizedBox(height: 20.w),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Text(
+            "Status",
+            style: TextStyle(
+              color: ColorsTheme.black,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(height: 20.w),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(4);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "All Status",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 4,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(4);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "All Status",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 4,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+            ),
+           const Divider(),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(0);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "Pending",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 0,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(0);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "Pending",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 0,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+            ),
+            const Divider(),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(1);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "Approved",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 1,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(1);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "Approved",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 1,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+            ),
+            const Divider(),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(2);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "Rejected",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 2,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(2);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "Rejected",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 2,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-        ],
-      ),
+            ),
+            const Divider(),
+          ],
+        ),
+      ],
     );
   }
 
@@ -460,7 +458,7 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
                         Row(
                           children: [
                             Padding(
-                              padding: EdgeInsets.only(left: 8.0),
+                              padding: EdgeInsets.only(left: 8.w),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[
@@ -479,7 +477,7 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
                               ),
                             ),
                             Padding(
-                              padding: EdgeInsets.only(left: 8.0),
+                              padding: EdgeInsets.only(left: 8.w),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: <Widget>[

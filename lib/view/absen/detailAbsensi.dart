@@ -5,14 +5,15 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
-import 'package:http/http.dart' as http;
 import 'dart:typed_data';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:flutter/gestures.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
 
 class DetailAbsensiPage extends StatefulWidget {
+  const DetailAbsensiPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _DetailAbsensiPageState createState() => _DetailAbsensiPageState();
 }
 
@@ -50,11 +51,11 @@ class _DetailAbsensiPageState extends State<DetailAbsensiPage> {
 
           try {
             final utcDateTime = DateTime.parse(data['details']['jam_absen']);
-            final offset = Duration(hours: 7);
+            final offset = const Duration(hours: 7);
             final indonesiaDateTime = utcDateTime.add(offset);
 
             final format = DateFormat('yyyy-MM-dd HH:mm:ss', 'id_ID');
-            createdAt = '${format.format(indonesiaDateTime)}';
+            createdAt = format.format(indonesiaDateTime);
             imgbase64 = data['details']['image64'];
             lokasi = data['details']['lokasi'];
           } catch (error) {

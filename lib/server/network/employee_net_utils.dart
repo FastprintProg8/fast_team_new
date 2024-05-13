@@ -4,12 +4,6 @@ import 'package:http/http.dart' as http;
 class EmployeeNetUtils {
   retriveListEmployee(token) async {
     var path = "${BaseServer.serverUrl}/api_absensi/divisi/";
-    Map<String, String> headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-      'Authorization': 'Bearer $token',
-    };
-
     var response = await http.get(Uri.parse(path), headers: {
       "Accept": "*/*",
       "Content-Type": "application/json",

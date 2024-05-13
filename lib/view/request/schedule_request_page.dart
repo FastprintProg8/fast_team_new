@@ -4,7 +4,7 @@ import 'package:Fast_Team/view/request/schedule/leave_page.dart';
 import 'package:Fast_Team/view/request/schedule/overtime_page.dart';
 
 class ScheduleRequestPage extends StatefulWidget {
-  const ScheduleRequestPage({Key? key}) : super(key: key);
+  const ScheduleRequestPage({super.key});
 
   @override
   State<ScheduleRequestPage> createState() => _ScheduleRequestPageState();

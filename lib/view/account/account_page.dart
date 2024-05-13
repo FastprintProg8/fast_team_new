@@ -1,7 +1,7 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, use_build_context_synchronously
+
 import 'package:Fast_Team/controller/account_controller.dart';
-import 'package:Fast_Team/controller/login_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
-import 'package:Fast_Team/model/user_model.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/view/account/personal_info_page.dart';
 import 'package:Fast_Team/view/auth/login_page.dart';
@@ -12,14 +12,13 @@ import 'package:Fast_Team/view/sertificate.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
 class AccountPage extends StatefulWidget {
-  const AccountPage({Key? key}) : super(key: key);
+  const AccountPage({super.key});
 
   @override
   State<AccountPage> createState() => _AccountPageState();
@@ -45,6 +44,7 @@ class _AccountPageState extends State<AccountPage> {
         color: ColorsTheme.white,
       );
 
+  @override
   void initState() {
     super.initState();
     initConstructor();
@@ -66,7 +66,7 @@ class _AccountPageState extends State<AccountPage> {
     fullNama = accountModel.fullName;
     divisi = accountModel.divisi;
     imgUrl = accountModel.imgProfUrl;
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         isLoading = false;
       });
@@ -85,7 +85,7 @@ class _AccountPageState extends State<AccountPage> {
       imgUrl = accountModel.imgProfUrl;
       isLoading = true;
     });
-    Future.delayed(Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
         isLoading = false;
       });
@@ -165,11 +165,11 @@ class _AccountPageState extends State<AccountPage> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PersonalInfo(),
+                  builder: (context) => const PersonalInfo(),
                 ),
               );
             }),
-            Divider(),
+            const Divider(),
             menuItems('Sertificate', Colors.cyan, Icons.badge, () async {
               Navigator.push(
                 context,
@@ -178,24 +178,24 @@ class _AccountPageState extends State<AccountPage> {
                 ),
               );
             }),
-            Divider(),
+            const Divider(),
             menuItems(
                 'Payroll Info', Colors.green, Icons.monetization_on, () {Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => PayrollInfo(),
+                  builder: (context) => const PayrollInfo(),
                 ),
               );}),
-            Divider(),
+            const Divider(),
             menuItems('Change Password', Colors.orange, Icons.lock, () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ResetPasswordPage(),
+                  builder: (context) => const ResetPasswordPage(),
                 ),
               );
             }),
-            Divider(),
+            const Divider(),
             menuItems(
               'Logout',
               Colors.red,
@@ -210,7 +210,7 @@ class _AccountPageState extends State<AccountPage> {
 
                 Navigator.of(context).pushReplacement(
                   MaterialPageRoute(
-                    builder: (BuildContext context) => LoginPage(),
+                    builder: (BuildContext context) => const LoginPage(),
                   ),
                 );
               },

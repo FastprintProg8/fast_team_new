@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http; // Import paket http
 import 'dart:convert'; // Import library untuk manipulasi JSON
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
+
 
 class EmployeePage extends StatefulWidget {
   @override

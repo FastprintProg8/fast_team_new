@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Fast_Team/view/inbox/approval/approval_attendance_page.dart';
 import 'package:Fast_Team/view/inbox/approval/approval_leave_page.dart';
 import 'package:Fast_Team/view/inbox/approval/approval_overtime_page.dart';
-import 'package:get/get.dart';
 
 class TabApprovalPage extends StatefulWidget {
   const TabApprovalPage({super.key});
@@ -53,14 +51,14 @@ class _TabApprovalPageState extends State<TabApprovalPage> with AutomaticKeepAli
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Success'),
+          title: const Text('Success'),
           content: Text(message),
           actions: <Widget>[
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -76,7 +74,7 @@ class _TabApprovalPageState extends State<TabApprovalPage> with AutomaticKeepAli
       ),
       title: Text(
         text,
-        style: TextStyle(color: Colors.black),
+        style: const TextStyle(color: Colors.black),
       ),
       trailing: const Icon(
         Icons.keyboard_arrow_right,
@@ -102,7 +100,7 @@ class _TabApprovalPageState extends State<TabApprovalPage> with AutomaticKeepAli
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ApprovalAttendancePage(),
+                  builder: (context) => const ApprovalAttendancePage(),
                 ),
               );
             }
@@ -115,7 +113,7 @@ class _TabApprovalPageState extends State<TabApprovalPage> with AutomaticKeepAli
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ApprovalLeavePage(),
+                  builder: (context) => const ApprovalLeavePage(),
                 ),
               );
             }
@@ -128,7 +126,7 @@ class _TabApprovalPageState extends State<TabApprovalPage> with AutomaticKeepAli
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => ApprovalOvertimePage(),
+                  builder: (context) => const ApprovalOvertimePage(),
                 ),
               );
             }

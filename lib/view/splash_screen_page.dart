@@ -1,8 +1,7 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'dart:async';
-import 'dart:convert';
 import 'package:Fast_Team/controller/login_controller.dart';
-import 'package:Fast_Team/model/user_model.dart';
-import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
-  const SplashScreen({Key? key}) : super(key: key);
+  const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -63,8 +62,10 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle(statusBarColor: ColorsTheme.white!),
       child: SafeArea(
         child: Scaffold(
           body: Center(
@@ -73,7 +74,6 @@ class _SplashScreenState extends State<SplashScreen> {
           backgroundColor: ColorsTheme.white!,
         ),
       ),
-      value: SystemUiOverlayStyle(statusBarColor: ColorsTheme.white!),
     );
   }
 }

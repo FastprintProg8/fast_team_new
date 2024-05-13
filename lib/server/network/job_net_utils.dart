@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:Fast_Team/server/base_server.dart';
 class JobNetUtils{

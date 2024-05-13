@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/view/navigator_bottom_menu.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +36,7 @@ class _LoginPageState extends State<LoginPage> {
     emailInput = TextEditingController();
     passwordInput = TextEditingController();
     loginController = Get.put(LoginController());
-    LocalSession localSession = Get.put(LocalSession());
+    Get.put(LocalSession());
   }
 
   initClearSession() async {
@@ -177,7 +179,7 @@ class _LoginPageState extends State<LoginPage> {
             controller.storeEmployeeInfo(employeeResult['details']['data']);
             Navigator.of(context).pushReplacement(
               MaterialPageRoute(
-                builder: (BuildContext context) => NavigatorBottomMenu(),
+                builder: (BuildContext context) => const NavigatorBottomMenu(),
               ),
             );
             // showSnackBar('berhasil');

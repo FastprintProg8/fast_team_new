@@ -1,22 +1,29 @@
+// ignore_for_file: prefer_typing_uninitialized_variables, deprecated_member_use
+
 import 'package:Fast_Team/controller/absent_controller.dart';
 import 'package:Fast_Team/controller/account_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
 import 'package:Fast_Team/model/coordinate_model.dart';
-import 'package:Fast_Team/server/network/employee_net_utils.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:get/get.dart';
 import 'package:latlong2/latlong.dart';
+// ignore: depend_on_referenced_packages
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MapPage extends StatefulWidget {
+  const MapPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _MapPageState createState() => _MapPageState();
 }
 
 class _MapPageState extends State<MapPage> {
   late SharedPreferences sharedPreferences;
+  // ignore: duplicate_ignore
+  // ignore: prefer_typing_uninitialized_variables
   var idUser;
   var imgProf;
   var kantor;
@@ -84,7 +91,7 @@ class _MapPageState extends State<MapPage> {
       _longitude = longitude;
     });
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       _mapController.move(LatLng(latitude, longitude), 18.0);
     });
   }
@@ -94,6 +101,7 @@ class _MapPageState extends State<MapPage> {
     _getCurrentLocation();
   }
 
+  // ignore: non_constant_identifier_names
   void cek_lokasi() {
     final List<String> imgProfParts =
         imgProf.split('/'); // Memecah string berdasarkan karakter "/"
@@ -119,7 +127,7 @@ class _MapPageState extends State<MapPage> {
       appBar: AppBar(
         title: Text(
           aksi == 'in' ? 'Clock In' : 'Clock Out',
-          style: TextStyle(
+          style: const TextStyle(
             color: Colors.black,
             fontSize: 18,
             fontWeight: FontWeight.bold,
@@ -136,7 +144,7 @@ class _MapPageState extends State<MapPage> {
         ),
         actions: [
           IconButton(
-            icon: Icon(Icons.refresh),
+            icon: const Icon(Icons.refresh),
             onPressed: () {
               _reloadMap();
             },

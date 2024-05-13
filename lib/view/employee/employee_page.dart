@@ -1,3 +1,5 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:flutter/material.dart';
@@ -8,6 +10,8 @@ import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EmployeePage extends StatefulWidget {
+  const EmployeePage({super.key});
+
   @override
   State<EmployeePage> createState() => _EmployeePageState();
 }
@@ -112,8 +116,18 @@ class _EmployeePageState extends State<EmployeePage> {
         final input = query.toLowerCase();
         return employeeName.contains(input);
       }).toList();
+      moreData = true;
     });
+      if(filteredEmployees.length <= 6){
+        delayMoreData();
+      }
   }
+  Future<void> delayMoreData() async {
+  await Future.delayed(const Duration(seconds: 3));
+  setState(() {
+    moreData = false;
+  });
+}
 
   _launchWhatsapp(phone) async {
     var whatsapp = phone;
@@ -151,6 +165,7 @@ class _EmployeePageState extends State<EmployeePage> {
     }
   }
 
+  @override
   void dispose() {
     listViewController.dispose();
     super.dispose();
@@ -160,7 +175,7 @@ class _EmployeePageState extends State<EmployeePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Employees'),
+        title: const Text('Employees'),
       ),
       body: Column(
         children: [
@@ -172,9 +187,9 @@ class _EmployeePageState extends State<EmployeePage> {
                   future: _fetchData,
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasError) {
-                      SchedulerBinding.instance!.addPostFrameCallback((_) {
+                      SchedulerBinding.instance.addPostFrameCallback((_) {
                         var snackbar = SnackBar(
                           content: Text('Error: ${snapshot.error}',
                               style: alertErrorTextStyle),
@@ -183,7 +198,7 @@ class _EmployeePageState extends State<EmployeePage> {
                         );
                         ScaffoldMessenger.of(context).showSnackBar(snackbar);
                       });
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     } else if (snapshot.hasData) {
                       return _body();
                     } else {
@@ -210,8 +225,8 @@ class _EmployeePageState extends State<EmployeePage> {
               padding: EdgeInsets.symmetric(vertical: 10.w),
               child: Center(
                 child: (moreData)
-                    ? CircularProgressIndicator()
-                    : Text('No more data'),
+                    ? const CircularProgressIndicator()
+                    : const Text('No more data'),
               ));
         }
       },
@@ -222,7 +237,7 @@ class _EmployeePageState extends State<EmployeePage> {
     return Column(
       children: <Widget>[
         ListTile(
-          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.w),
           leading: CircleAvatar(
             radius: 19.r,
             backgroundColor: ColorsTheme.lightGrey3,
@@ -234,29 +249,29 @@ class _EmployeePageState extends State<EmployeePage> {
             employee['nama'],
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 16,
+              fontSize: 16.sp,
             ),
           ),
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
               IconButton(
-                icon: Icon(Icons.phone, size: 24, color: Colors.blue),
+                icon: Icon(Icons.phone, size: 24.sp, color: Colors.blue),
                 onPressed: () {
                   _launchPhone(employee['wa'].toString().substring(1));
                 },
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 10.w),
               IconButton(
-                icon: Icon(Icons.email, size: 24, color: Colors.blue),
+                icon: Icon(Icons.email, size: 24.sp, color: Colors.blue),
                 onPressed: () {
                   _launchMail(employee['email']);
                 },
               ),
-              SizedBox(width: 10),
+              SizedBox(width: 10.w),
               IconButton(
                 icon: ImageIcon(
-                  AssetImage(
+                  const AssetImage(
                     'assets/img/whatsapp.png',
                   ),
                   color: ColorsTheme.lightGreen,
@@ -279,16 +294,16 @@ class _EmployeePageState extends State<EmployeePage> {
 
   Padding _searchBar() {
     return Padding(
-      padding: EdgeInsets.all(16),
+      padding: EdgeInsets.all(16.w),
       child: TextField(
         controller: searchText,
         decoration: InputDecoration(
           hintText: 'Search',
-          prefixIcon: Icon(Icons.search),
+          prefixIcon: const Icon(Icons.search),
           border:
               OutlineInputBorder(borderRadius: BorderRadius.circular(100.0)),
           suffixIcon: IconButton(
-            icon: Icon(Icons.clear),
+            icon: const Icon(Icons.clear),
             onPressed: () {
               filterEmployees('');
               searchText.clear();

@@ -8,9 +8,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -19,14 +16,17 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: DaftarAbsensiPage(),
     );
   }
 }
 
 class DaftarAbsensiPage extends StatefulWidget {
+  const DaftarAbsensiPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _DaftarAbsensiPageState createState() => _DaftarAbsensiPageState();
 }
 
@@ -70,12 +70,6 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
       _loadData = _loadDataForSelectedMonth();
     });
   }
-
-  Future<void> _loadUserId() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    userId = prefs.getInt('user-id_user') ?? 0;
-  }
-
   Future<void> _loadDataForSelectedMonth() async {
     absentController = Get.put(AbsentController());
 
@@ -118,7 +112,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
             color: Colors.white,
           ),
         ),
-        SizedBox(height: 8.0),
+        const SizedBox(height: 8.0),
         Text(
           count,
           style: TextStyle(
@@ -159,9 +153,9 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
           future: _loadData,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
                   content: Text('Error: ${snapshot.error}',
                       style: alertErrorTextStyle),
@@ -170,7 +164,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
                 );
                 ScaffoldMessenger.of(context).showSnackBar(snackbar);
               });
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasData) {
               return _body(context, formattedDate, daysInMonth);
             } else {
@@ -184,7 +178,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
   Widget _body(BuildContext context, String formattedDate, int daysInMonth) {
     return Column(
       children: [
-        SizedBox(height: 20.0),
+        SizedBox(height: 20.w),
         Container(
           margin: EdgeInsets.symmetric(horizontal: 15.w),
           child: TextButton(
@@ -192,9 +186,9 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
               _selectMonth(context);
             },
             style: TextButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 5.0),
+              padding: EdgeInsets.symmetric(horizontal: 5.w),
               backgroundColor: Colors.transparent,
-              side: BorderSide(color: Colors.black, width: 1.0),
+              side: const BorderSide(color: Colors.black, width: 1.0),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -203,20 +197,20 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
                   margin: EdgeInsets.symmetric(horizontal: 5.w),
                   child: Row(
                     children: <Widget>[
-                      Icon(
+                      const Icon(
                         Icons.calendar_today,
                         size: 24,
                       ),
-                      SizedBox(width: 8.0),
+                      const SizedBox(width: 8.0),
                       Text(
                         formattedDate,
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontSize: 18, fontWeight: FontWeight.normal),
                       ),
                     ],
                   ),
                 ),
-                Icon(
+                const Icon(
                   Icons.arrow_drop_down,
                   size: 24,
                 ),
@@ -226,12 +220,13 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
         ),
         SizedBox(height: 5.w),
         cardAbsentInfo(context),
-        SizedBox(height: 5.0),
+        SizedBox(height: 5.w),
         ListAbsent(daysInMonth),
       ],
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget ListAbsent(int daysInMonth) {
     return Expanded(
       child: RefreshWidget(
@@ -239,7 +234,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
         child: ListView.separated(
           itemCount: daysInMonth,
           separatorBuilder: (BuildContext context, int index) =>
-              SizedBox(height: 10), // Jarak antara setiap item
+              const SizedBox(height: 10), // Jarak antara setiap item
           itemBuilder: (BuildContext context, int index) {
             final Map<String, dynamic> item =
                 _data.isNotEmpty ? _data[index] : {};
@@ -280,7 +275,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [Color(0xFF42A5F5), Color(0xFF1976D2), Color(0xFF0D47A1)],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -299,7 +294,7 @@ class _DaftarAbsensiPageState extends State<DaftarAbsensiPage> {
                       'Early Clock Out', '$earlyClockOutCount', 14),
                 ],
               ),
-              SizedBox(height: 16.0),
+              const SizedBox(height: 16.0),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: <Widget>[
@@ -326,7 +321,7 @@ class AbsensiListItem extends StatefulWidget {
   final int idKeluar;
   final bool isSunday;
 
-  AbsensiListItem({
+  const AbsensiListItem({super.key, 
     required this.dateText,
     required this.dateColor,
     required this.jamMasuk,
@@ -337,6 +332,7 @@ class AbsensiListItem extends StatefulWidget {
   });
 
   @override
+  // ignore: library_private_types_in_public_api
   _AbsensiListItemState createState() => _AbsensiListItemState();
 }
 
@@ -373,13 +369,13 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                   children: [
                     Padding(
                       padding: EdgeInsets.only(
-                          right: 10), // Jeda 10px di antara kedua teks
+                          right: 10.w), // Jeda 10px di antara kedua teks
                       child: Text(
                         (widget.jamMasuk.isEmpty)
                             ? '--:--'
                             : widget.jamMasuk[0]['jam_absen'],
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -389,7 +385,7 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                           ? '--:--'
                           : lastJamKeluar['jam_absen'],
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 16.sp,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -427,8 +423,8 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
               child: Column(
                 children: <Widget>[
-                  Divider(), // Divider added here
-                  SizedBox(height: 5),
+                  const Divider(), // Divider added here
+                  const SizedBox(height: 5),
                   ...widget.jamMasuk.map((jamMasukItem) {
                     return Column(
                       children: [
@@ -458,19 +454,19 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                                   fontWeight: FontWeight.w900
                                 ),
                               ),
-                              Icon(
+                              const Icon(
                                 Icons.arrow_right_rounded,
                                 size: 24,
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
-                        Divider(), // Divider added here
+                        SizedBox(height: 5.w),
+                        const Divider(), // Divider added here
                       ],
                     );
-                  }).toList(),
-                  SizedBox(height: 5),
+                  }),
+                  SizedBox(height: 5.w),
                   ...widget.jamKeluar.map((jamKeluarItem) {
                     return Column(
                       children: [
@@ -500,19 +496,19 @@ class _AbsensiListItemState extends State<AbsensiListItem> {
                                   fontWeight: FontWeight.w900
                                 ),
                               ),
-                              Icon(
+                              const Icon(
                                 Icons.arrow_right_rounded,
                                 size: 24,
                               ),
                             ],
                           ),
                         ),
-                        SizedBox(height: 5),
-                        Divider(), // Divider added here
+                        SizedBox(height: 5.w),
+                        const Divider(), // Divider added here
                       ],
                     );
-                  }).toList(),
-                  SizedBox(height: 10),
+                  }),
+                  SizedBox(height: 10.w),
                 ],
               ),
             ),

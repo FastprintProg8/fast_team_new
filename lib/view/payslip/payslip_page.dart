@@ -1,24 +1,14 @@
-import 'dart:io';
-
 import 'package:Fast_Team/controller/account_controller.dart';
 import 'package:Fast_Team/controller/payroll_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
-import 'package:path/path.dart' as path;
 import 'package:url_launcher/url_launcher.dart';
 
 class PayslipPage extends StatefulWidget {
@@ -36,81 +26,89 @@ class _PayslipPageState extends State<PayslipPage> {
   var id_account;
   var id_payroll;
   var imgUrl;
-  var basic_salary = 0;
-  var net_salary = 0;
-  var deduction = 0;
-  var allowance = 0;
+  var basic_salary = 0.0;
+  var net_salary = 0.0;
+  var deduction = 0.0;
+  var allowance = 0.0;
   var detail_payroll = [];
   Future? _fetchData;
   bool isOpen = false;
   DateTime _selectedDate = DateTime.now();
   bool showSalary = false;
 
-  TextStyle alertErrorTextStyle = TextStyle(
+  TextStyle alertErrorTextStyle = const TextStyle(
     fontFamily: 'Poppins',
-    fontSize: 12.sp,
+    fontSize: 12,
     fontWeight: FontWeight.w400,
-    color: ColorsTheme.white,
+    color: Colors.white,
   );
 
   @override
   void initState() {
     super.initState();
     initConstructor();
+    initData();
   }
 
   Future refreshItem() async {
     setState(() {
-      _fetchData = initData();
+      _fetchData = payrolData();
       showSalary = false;
     });
   }
 
   initConstructor() async {
+    id_account = 0.obs;
     nama = "".obs;
     posisi = "".obs;
     imgUrl = "".obs;
     id_payroll = "".obs;
-    
+    divisi = "".obs;
     setState(() {
-      _fetchData = initData();
+      _fetchData = payrolData();
     });
   }
 
-  Future<void> initData() async {
+  initData() async {
     AccountController accountController = Get.put(AccountController());
-    String formattedDate = formatDate(_selectedDate);
     var result = await accountController.retriveAccountInformation();
     AccountInformationModel accountModel =
         AccountInformationModel.fromJson(result['details']['data']);
+    setState(() {
+      id_account.value = accountModel.id;
+      nama.value = accountModel.fullName;
+      posisi.value = accountModel.posisiPekerjaan;
+      divisi.value = accountModel.divisi;
+      imgUrl.value = accountModel.imgProfUrl;
+      
+    });
+    
+  }
+
+  Future<void> payrolData() async {
+    String formattedDate = formatDate(_selectedDate);
     PayrollController payrollController = Get.put(PayrollController());
     var salaryResult = await payrollController.retrivePayroll(formattedDate);
     var salaryDetail = await payrollController
         .retriveDetailPayroll(salaryResult['details']['id']);
     setState(() {
-      id_account = accountModel.id;
-      nama = accountModel.fullName;
-      posisi = accountModel.posisiPekerjaan;
-      divisi = accountModel.divisi;
-      imgUrl = accountModel.imgProfUrl;
-      id_payroll = salaryResult['details']['id'];
+      id_payroll.value = salaryResult['details']['id'];
       basic_salary = salaryResult['details']['basic_salary'];
       net_salary = salaryResult['details']['take_home_pay'];
       detail_payroll = salaryDetail['details'];
       deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
       allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
     });
-    
   }
 
-  int calculateTotalDeductionAmount(List<dynamic> data, type) {
-    int totalAmount = 0;
-    for (var item in data) {
+  double calculateTotalDeductionAmount(List<dynamic> detail_payroll, String type) {
+    double total = 0.0;
+    for (var item in detail_payroll) {
       if (item['type'] == type) {
-        totalAmount += (item['amount'] as num).toInt();
+        total += item['amount'];
       }
     }
-    return totalAmount;
+    return total;
   }
 
   String formatDate(DateTime date) {
@@ -119,7 +117,7 @@ class _PayslipPageState extends State<PayslipPage> {
     return formattedDate;
   }
 
-  String formatCurrency(int amount) {
+  String formatCurrency(double amount) {
     final formatter = NumberFormat("#,##0", "en_US");
     return formatter.format(amount).replaceAll(',', '.');
   }
@@ -134,7 +132,7 @@ class _PayslipPageState extends State<PayslipPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
-           _fetchData = initData();
+           _fetchData = payrolData();
         });
         // await _loadDataForSelectedMonth();
       }
@@ -163,7 +161,7 @@ class _PayslipPageState extends State<PayslipPage> {
           future: _fetchData,
           builder: (context, AsyncSnapshot snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return  _bodyContent(context, formattedDate,true);
             } else if (snapshot.hasData) {
@@ -200,84 +198,82 @@ class _PayslipPageState extends State<PayslipPage> {
   }
 
   Widget _bodyContent(BuildContext context, String formattedDate,bool isEmpty) {
-    return Container(
-      child: Column(
-        children: [
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 15.w),
-            child: TextButton(
-              onPressed: () {
-                _selectMonth(context);
-              },
-              style: TextButton.styleFrom(
-                padding: EdgeInsets.symmetric(horizontal: 5.0),
-                backgroundColor: Colors.transparent,
-                side: BorderSide(color: Colors.black, width: 1.0),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 5.w),
-                    child: Row(
-                      children: <Widget>[
-                        Icon(
-                          Icons.calendar_today,
-                          size: 24,
-                        ),
-                        SizedBox(width: 8.0),
-                        Text(
-                          formattedDate,
-                          style: TextStyle(
-                              fontSize: 18, fontWeight: FontWeight.normal),
-                        ),
-                      ],
-                    ),
+    return Column(
+      children: [
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 15.w),
+          child: TextButton(
+            onPressed: () {
+              _selectMonth(context);
+            },
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 5.w),
+              backgroundColor: Colors.transparent,
+              side: const BorderSide(color: Colors.black, width: 1.0),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Container(
+                  margin: EdgeInsets.symmetric(horizontal: 5.w),
+                  child: Row(
+                    children: <Widget>[
+                      const Icon(
+                        Icons.calendar_today,
+                        size: 24,
+                      ),
+                      const SizedBox(width: 8.0),
+                      Text(
+                        formattedDate,
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.normal),
+                      ),
+                    ],
                   ),
-                  Icon(
-                    Icons.arrow_drop_down,
-                    size: 24,
-                  ),
-                ],
-              ),
+                ),
+                const Icon(
+                  Icons.arrow_drop_down,
+                  size: 24,
+                ),
+              ],
             ),
           ),
-          _cardInfo(context),
-          SizedBox(height: 20.h),
-          (!isEmpty)?
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 10.w),
-              child: ListView(
-                children: [
-                  _salarySlipCard(context),
-                  SizedBox(
-                    height: 10.w,
-                  ),
-                  ElevatedButton(
-                      onPressed: () {
-                        download().then((_) {
-                          print('Payslip is downloaded !');
-                        });
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.blue[900],
-                        splashFactory: InkSplash.splashFactory,
-                        minimumSize: const Size(double.infinity, 48.0),
-                      ),
-                      child: Text(
-                        'Download Salary Slip',
-                        style: TextStyle(color: Colors.white),
-                      ))
-                ],
-              ),
+        ),
+        _cardInfo(context),
+        SizedBox(height: 20.h),
+        (!isEmpty)?
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.symmetric(horizontal: 10.w),
+            child: ListView(
+              children: [
+                _salarySlipCard(context),
+                SizedBox(
+                  height: 10.w,
+                ),
+                ElevatedButton(
+                    onPressed: () {
+                      download().then((_) {
+                        print('Payslip is downloaded !');
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue[900],
+                      splashFactory: InkSplash.splashFactory,
+                     
+                    ),
+                    child: const Text(
+                      'Download Salary Slip',
+                      style: TextStyle(color: Colors.white),
+                    ))
+              ],
             ),
-          ): _noNotifications()
-        ],
-      ),
+          ),
+        ): _noData()
+      ],
     );
   }
-  Widget _noNotifications() {
+  Widget _noData() {
     return Expanded(
       child: ListView(
           children: <Widget>[
@@ -302,8 +298,8 @@ class _PayslipPageState extends State<PayslipPage> {
             const SizedBox(
               height: 16.0,
             ),
-            Center(
-              child: const Text(
+            const Center(
+              child: Text(
                 'There is no data',
                 style: TextStyle(
                   fontSize: 18,
@@ -319,7 +315,8 @@ class _PayslipPageState extends State<PayslipPage> {
     return Card(
       child: ExpansionTile(
         initiallyExpanded: true,
-        title: Text("Salary Slip"),
+        title: const Text("Salary Slip"),
+        shape: Border.all(color: Colors.transparent),
         children: [
           Container(
             color: ColorsTheme.white,
@@ -334,7 +331,7 @@ class _PayslipPageState extends State<PayslipPage> {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Basic Salary",
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
@@ -351,11 +348,11 @@ class _PayslipPageState extends State<PayslipPage> {
                             ),
                           ),
                           if (detail_payroll.isEmpty)
-                            Text("")
+                            const Text("")
                           else if (detail_payroll
                               .where((item) => item["type"] == "allowance")
                               .isEmpty)
-                            Text(
+                            const Text(
                               "-",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -374,7 +371,7 @@ class _PayslipPageState extends State<PayslipPage> {
                                   .join(' ');
                               return Text(
                                 "$jenis",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               );
@@ -393,11 +390,11 @@ class _PayslipPageState extends State<PayslipPage> {
                             ),
                           ),
                           if (detail_payroll.isEmpty) // Cek apakah data kosong
-                            Text("") // Jika kosong, kembalikan Text kosong
+                            const Text("") // Jika kosong, kembalikan Text kosong
                           else if (detail_payroll
                               .where((item) => item["type"] == "deduction")
                               .isEmpty)
-                            Text(
+                            const Text(
                               "-",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -416,7 +413,7 @@ class _PayslipPageState extends State<PayslipPage> {
                                   .join(' ');
                               return Text(
                                 "$jenis",
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               );
@@ -428,20 +425,20 @@ class _PayslipPageState extends State<PayslipPage> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 "Rp. ",
                                 style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(""),
+                              const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                Text("") // Jika kosong, kembalikan Text kosong
+                                const Text("") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "allowance")
                                   .isEmpty)
-                                Text(
+                                const Text(
                                   "-",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -452,24 +449,21 @@ class _PayslipPageState extends State<PayslipPage> {
                                     .where(
                                         (item) => item["type"] == "allowance")
                                     .map((item) {
-                                  int amount = item["amount"];
-                                  String formattedAmount =
-                                      formatCurrency(amount);
-                                  return Text(
+                                  return const Text(
                                     "Rp. ",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
-                                }).toList(),
-                              Text(""),
+                                }),
+                              const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                Text("") // Jika kosong, kembalikan Text kosong
+                                const Text("") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "deduction")
                                   .isEmpty)
-                                Text(
+                                const Text(
                                   "-",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -480,35 +474,32 @@ class _PayslipPageState extends State<PayslipPage> {
                                     .where(
                                         (item) => item["type"] == "deduction")
                                     .map((item) {
-                                  int amount = item["amount"];
-                                  String formattedAmount =
-                                      formatCurrency(amount);
-                                  return Text(
+                                  return const Text(
                                     "Rp. ",
                                     style: TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
-                                }).toList(),
+                                }),
                             ],
                           ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                "${formatCurrency(basic_salary)}",
-                                style: TextStyle(
+                                formatCurrency(basic_salary),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(""),
+                              const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                Text("") // Jika kosong, kembalikan Text kosong
+                                const Text("") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "allowance")
                                   .isEmpty)
-                                Text(
+                                const Text(
                                   "-",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -519,24 +510,24 @@ class _PayslipPageState extends State<PayslipPage> {
                                     .where(
                                         (item) => item["type"] == "allowance")
                                     .map((item) {
-                                  int amount = item["amount"];
+                                  double amount = item["amount"];
                                   String formattedAmount =
                                       formatCurrency(amount);
                                   return Text(
-                                    "$formattedAmount",
-                                    style: TextStyle(
+                                    formattedAmount,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
                                 }).toList(),
-                              Text(""),
+                              const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                Text("") // Jika kosong, kembalikan Text kosong
+                                const Text("") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "deduction")
                                   .isEmpty)
-                                Text(
+                                const Text(
                                   "-",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
@@ -547,12 +538,12 @@ class _PayslipPageState extends State<PayslipPage> {
                                     .where(
                                         (item) => item["type"] == "deduction")
                                     .map((item) {
-                                  int amount = item["amount"];
+                                  double amount = item["amount"];
                                   String formattedAmount =
                                       formatCurrency(amount);
                                   return Text(
-                                    "$formattedAmount",
-                                    style: TextStyle(
+                                    formattedAmount,
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   );
@@ -564,12 +555,12 @@ class _PayslipPageState extends State<PayslipPage> {
                     ],
                   ),
                   SizedBox(height: 10.w),
-                  Divider(),
+                  const Divider(),
                   SizedBox(height: 10.w),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Column(
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
@@ -595,7 +586,7 @@ class _PayslipPageState extends State<PayslipPage> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Column(
+                          const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
@@ -622,20 +613,20 @@ class _PayslipPageState extends State<PayslipPage> {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                "${formatCurrency(basic_salary)}",
-                                style: TextStyle(
+                                formatCurrency(basic_salary),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                "${formatCurrency(allowance)}",
-                                style: TextStyle(
+                                formatCurrency(allowance),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
                               Text(
-                                "${formatCurrency(deduction)}",
-                                style: TextStyle(
+                                formatCurrency(deduction),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -656,7 +647,7 @@ class _PayslipPageState extends State<PayslipPage> {
             child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
+                  const Text(
                     "Take Home Pay",
                     style: TextStyle(
                       color: Colors.black,
@@ -666,7 +657,7 @@ class _PayslipPageState extends State<PayslipPage> {
                   ),
                   Text(
                     "Rp ${formatCurrency(net_salary)}",
-                    style: TextStyle(
+                    style: const TextStyle(
                       color: Colors.black,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -675,7 +666,6 @@ class _PayslipPageState extends State<PayslipPage> {
                 ]),
           ),
         ],
-        shape: Border.all(color: Colors.transparent),
       ),
     );
   }
@@ -692,7 +682,7 @@ class _PayslipPageState extends State<PayslipPage> {
         ),
         child: Container(
           decoration: BoxDecoration(
-            gradient: LinearGradient(
+            gradient: const LinearGradient(
               colors: [Color(0xFF42A5F5), Color(0xFF1976D2), Color(0xFF0D47A1)],
               begin: Alignment.centerLeft,
               end: Alignment.centerRight,
@@ -705,16 +695,16 @@ class _PayslipPageState extends State<PayslipPage> {
               margin: EdgeInsets.only(bottom: 10.w),
               child: Row(
                 children: [
-                  // CachedNetworkImage(
-                  //   imageUrl: '$imgUrl',
-                  //   imageBuilder: (context, imageProvider) => ClipRRect(
-                  //     borderRadius: BorderRadius.circular(30.r),
-                  //     child: CircleAvatar(
-                  //       radius: 30.r,
-                  //       backgroundImage: imageProvider,
-                  //     ),
-                  //   ),
-                  // ),
+                  CachedNetworkImage(
+                    imageUrl: '$imgUrl',
+                    imageBuilder: (context, imageProvider) => ClipRRect(
+                      borderRadius: BorderRadius.circular(30.r),
+                      child: CircleAvatar(
+                        radius: 30.r,
+                        backgroundImage: imageProvider,
+                      ),
+                    ),
+                  ),
                   SizedBox(
                     width: 10.w,
                   ),

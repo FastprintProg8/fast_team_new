@@ -1,16 +1,12 @@
 import 'package:Fast_Team/controller/milestone_controller.dart';
-import 'package:Fast_Team/server/network/job_net_utils.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/widget/bottom_nav_bar.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:stepper_list_view/stepper_list_view.dart';
 import 'package:timeline_tile/timeline_tile.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class MilestonePage extends StatefulWidget {
   const MilestonePage({super.key});
@@ -32,22 +28,18 @@ class _MilestonePageState extends State<MilestonePage> {
   initData() async {
     milestoneController = Get.put(MilestoneController());
     var result = await milestoneController!.retrieveJobHistory(1);
-    print(result);
-    // setState(() {
-    //   arrayData = result['details'];
-    // });
+    // print(result);
+    setState(() {
+      arrayData = result['details'];
+    });
   }
 
   List<Color> colors = [Colors.purple, Colors.red, Colors.yellow, Colors.green];
   int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
-    String getMonthYear(DateTime dateTime) {
-      final DateFormat formatter = DateFormat('MMMM yyyy');
-      return formatter.format(dateTime);
-    }
 
-    final theme = Theme.of(context);
+    Theme.of(context);
     return Scaffold(
       appBar: AppBar(
           title: const Text(
@@ -136,7 +128,7 @@ class _MilestonePageState extends State<MilestonePage> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -153,7 +145,7 @@ class _MilestonePageState extends State<MilestonePage> {
                       SizedBox(height: 5.w),
                       Text(
                         name,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
                         title ?? 'null',
@@ -162,32 +154,28 @@ class _MilestonePageState extends State<MilestonePage> {
                         height: 10.w,
                       ),
                       Row(children: [
-                        Container(
-                          child: Column(
-                            children: [
-                              Icon(Icons.work),
-                              SizedBox(height: 2.w),
-                              Icon(MdiIcons.sitemap),
-                              SizedBox(height: 2.w),
-                              Icon(MdiIcons.cashMultiple),
-                            ],
-                          ),
+                        Column(
+                          children: [
+                            const Icon(Icons.work),
+                            SizedBox(height: 2.w),
+                            Icon(MdiIcons.sitemap),
+                            SizedBox(height: 2.w),
+                            Icon(MdiIcons.cashMultiple),
+                          ],
                         ),
                         SizedBox(
                           width: 5.w,
                         ),
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            // mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(job),
-                              SizedBox(height: 5.w),
-                              Text(position),
-                              SizedBox(height: 5.w),
-                              Text(salary),
-                            ],
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(job),
+                            SizedBox(height: 5.w),
+                            Text(position),
+                            SizedBox(height: 5.w),
+                            Text(salary),
+                          ],
                         ),
                       ]),
                     ],
@@ -237,7 +225,7 @@ class _MilestonePageState extends State<MilestonePage> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -254,7 +242,7 @@ class _MilestonePageState extends State<MilestonePage> {
                       SizedBox(height: 5.w),
                       Text(
                         name,
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
                         title ?? 'null',
@@ -263,32 +251,28 @@ class _MilestonePageState extends State<MilestonePage> {
                         height: 10.w,
                       ),
                       Row(children: [
-                        Container(
-                          child: Column(
-                            children: [
-                              Icon(Icons.work),
-                              SizedBox(height: 2.w),
-                              Icon(MdiIcons.sitemap),
-                              SizedBox(height: 2.w),
-                              Icon(MdiIcons.cashMultiple),
-                            ],
-                          ),
+                        Column(
+                          children: [
+                            const Icon(Icons.work),
+                            SizedBox(height: 2.w),
+                            Icon(MdiIcons.sitemap),
+                            SizedBox(height: 2.w),
+                            Icon(MdiIcons.cashMultiple),
+                          ],
                         ),
                         SizedBox(
                           width: 5.w,
                         ),
-                        Container(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            // mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Text(job),
-                              SizedBox(height: 5.w),
-                              Text(position),
-                              SizedBox(height: 5.w),
-                              Text(salary),
-                            ],
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          // mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(job),
+                            SizedBox(height: 5.w),
+                            Text(position),
+                            SizedBox(height: 5.w),
+                            Text(salary),
+                          ],
                         ),
                       ]),
                     ],

@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:Fast_Team/helpers/response_helper.dart';
 import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/server/network/absent_net_utils.dart';
@@ -22,6 +20,7 @@ class HomeController extends GetxController {
   getListBelumAbsen(String tanggal, int idDivisi) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
+    // ignore: prefer_typing_uninitialized_variables
     final response;
     if (idDivisi > 0) {
       response = await absentNetUtils.retriveUserAbsenDateDevisi(

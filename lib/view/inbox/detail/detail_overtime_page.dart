@@ -1,11 +1,8 @@
-import 'package:Fast_Team/style/color_theme.dart';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class OvertimeDetailPage extends StatefulWidget {
   const OvertimeDetailPage({super.key});
@@ -97,12 +94,11 @@ class _OvertimeDetailPageState extends State<OvertimeDetailPage> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                          child: CircleAvatar(
+                      CircleAvatar(
                         radius: 30.r,
                         backgroundImage: NetworkImage(
                             "http://103.29.214.154:9002/assets/imgUserProfile/${photo!}"),
-                      )),
+                      ),
                       Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -130,21 +126,20 @@ class _OvertimeDetailPageState extends State<OvertimeDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                        child: Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Your approval for overtime work on ${tanggal}, with start in ${start_time} and end in ${end_time} , has ${getStatusText(status!)} status.",
+                          "Your approval for overtime work on $tanggal, with start in $start_time and end in $end_time , has ${getStatusText(status!)} status.",
                           style: TextStyle(fontSize: 14.sp),
                         ),
                         SizedBox(height: 6.h),
                         Text(
-                          "Detail Overtime :\nDate : ${tanggal} \nStart time : ${start_time} \nEnd time : ${end_time} \nStatus : ${getStatusText(status!)} ",
+                          "Detail Overtime :\nDate : $tanggal \nStart time : $start_time \nEnd time : $end_time \nStatus : ${getStatusText(status!)} ",
                           style: TextStyle(fontSize: 14.sp),
                         ),
                       ],
-                    )),
+                    ),
                   ],
                 ),
               ),

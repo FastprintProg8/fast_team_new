@@ -1,6 +1,7 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:Fast_Team/controller/account_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
-import 'package:Fast_Team/model/user_model.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/view/account/submission_page.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
@@ -18,7 +19,6 @@ class PersonalInfo extends StatefulWidget {
 }
 
 class _PersonalInfoState extends State<PersonalInfo> {
-  @override
   var email;
   var nama;
   var fullname;
@@ -45,6 +45,7 @@ class _PersonalInfoState extends State<PersonalInfo> {
     color: ColorsTheme.white,
   );
 
+  @override
   void initState() {
     super.initState();
     initConstructor();
@@ -212,9 +213,9 @@ class _PersonalInfoState extends State<PersonalInfo> {
           IconButton(
               onPressed: () {
                 Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SubmissionPage()));
+                    MaterialPageRoute(builder: (context) => const SubmissionPage()));
               },
-              icon: Icon(Icons.edit_square))
+              icon: const Icon(Icons.edit_square))
         ],
       ),
       body: RefreshWidget(
@@ -225,12 +226,13 @@ class _PersonalInfoState extends State<PersonalInfo> {
   }
 }
 
+// ignore: camel_case_types
 class itemList extends StatelessWidget {
   const itemList({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
-  }) : super(key: key);
+  });
   final String title;
   final String subtitle;
   @override

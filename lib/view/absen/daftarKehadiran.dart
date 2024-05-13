@@ -17,7 +17,6 @@ class DaftarKehadiranPage extends StatefulWidget {
 }
 
 class _DaftarKehadiranPageState extends State<DaftarKehadiranPage> {
-  CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
   int _selectedYear = DateTime.now().year;

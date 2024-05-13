@@ -1,13 +1,11 @@
 import 'package:Fast_Team/controller/milestone_controller.dart';
-import 'package:Fast_Team/server/network/job_net_utils.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:stepper_list_view/stepper_list_view.dart';
-import 'package:url_launcher/url_launcher.dart';
+
 
 class MilestonePage extends StatefulWidget {
   const MilestonePage({super.key});
@@ -91,7 +89,6 @@ class _MilestonePageState extends State<MilestonePage> {
           showStepperInLast: true,
           stepperData: _stepperData,
           stepAvatar: (_, data) {
-            final stepData = data as StepperItemData;
             return PreferredSize(
               preferredSize: Size.fromRadius(15.r),
               child: Container(

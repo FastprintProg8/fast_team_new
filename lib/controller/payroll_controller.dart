@@ -1,4 +1,3 @@
-import "dart:convert";
 import 'package:Fast_Team/helpers/response_helper.dart';
 import 'package:Fast_Team/server/network/payroll_net_utils.dart';
 import 'package:get/get.dart';
@@ -14,10 +13,11 @@ class PayrollController {
     return ResponseHelper().jsonResponse(result);
   }
 
-  retriveDetailPayroll(payroll_id)async{
+  retriveDetailPayroll(payrollId)async{
+    print(payrollId);
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    var result = await payrollNetUtils.requestDetailPayroll(token,payroll_id);
+    var result = await payrollNetUtils.requestDetailPayroll(token,payrollId);
     return  ResponseHelper().jsonResponse(result);
   }
 

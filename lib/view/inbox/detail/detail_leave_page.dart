@@ -1,11 +1,8 @@
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LeaveDetailPage extends StatefulWidget {
   const LeaveDetailPage({super.key});
@@ -41,7 +38,7 @@ class _LeaveDetailPageState extends State<LeaveDetailPage> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Evidence Picture'),
+          title: const Text('Evidence Picture'),
           content: Image.network(
             'http://103.29.214.154:9002/static/bukti/$image',
             errorBuilder: (context, error, stackTrace) => const SizedBox(
@@ -62,7 +59,7 @@ class _LeaveDetailPageState extends State<LeaveDetailPage> {
               onPressed: () {
                 Navigator.of(context).pop(); // Close the dialog
               },
-              child: Text('OK'),
+              child: const Text('OK'),
             ),
           ],
         );
@@ -133,12 +130,11 @@ class _LeaveDetailPageState extends State<LeaveDetailPage> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                          child: CircleAvatar(
+                      CircleAvatar(
                         radius: 30.r,
                         backgroundImage: NetworkImage(
                             "http://103.29.214.154:9002/assets/imgUserProfile/${photo!}"),
-                      )),
+                      ),
                       Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -166,17 +162,16 @@ class _LeaveDetailPageState extends State<LeaveDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                        child: Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Your approval for ${cuti} on ${tanggal} at ${time}, with reason ${alasan}, has ${getStatusText(status!)} status.",
+                          "Your approval for $cuti on $tanggal at $time, with reason $alasan, has ${getStatusText(status!)} status.",
                           style: TextStyle(fontSize: 14.sp),
                         ),
                         SizedBox(height: 6.h),
                         Text(
-                          "Detail Leave :\nDate : ${tanggal} \nTime : ${time} \nStatus : ${getStatusText(status!)} \nReason : ${alasan} ",
+                          "Detail Leave :\nDate : $tanggal \nTime : $time \nStatus : ${getStatusText(status!)} \nReason : $alasan ",
                           style: TextStyle(fontSize: 14.sp),
                         ),
                         RichText(
@@ -205,7 +200,7 @@ class _LeaveDetailPageState extends State<LeaveDetailPage> {
                           ),
                         ),
                       ],
-                    )),
+                    ),
                   ],
                 ),
               ),

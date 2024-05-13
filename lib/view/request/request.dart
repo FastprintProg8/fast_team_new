@@ -1,9 +1,11 @@
+// ignore_for_file: depend_on_referenced_packages, library_private_types_in_public_api
+
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
 import 'package:Fast_Team/user/controllerApi.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -11,6 +13,8 @@ import 'package:camera/camera.dart';
 import 'package:http_parser/http_parser.dart';
 
 class RequestPage extends StatefulWidget {
+  const RequestPage({super.key});
+
   @override
   _RequestPageState createState() => _RequestPageState();
 }
@@ -79,9 +83,11 @@ class _RequestPageState extends State<RequestPage> {
           acaraOptionsList = acaraOptions;
         });
       } else {
+        // ignore: avoid_print
         print('Failed to load acara options: ${response.statusCode}');
       }
     } catch (error) {
+      // ignore: avoid_print
       print('An error occurred while fetching acara options: $error');
     }
   }
@@ -97,7 +103,7 @@ class _RequestPageState extends State<RequestPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
+                  const Text(
                     'Select Type Request',
                     style: TextStyle(
                       fontSize: 18.0,
@@ -105,7 +111,7 @@ class _RequestPageState extends State<RequestPage> {
                       color: Colors.white,
                     ),
                   ),
-                  SizedBox(height: 20.0),
+                  SizedBox(height: 20.w),
                   Container(
                     padding: EdgeInsets.fromLTRB(10, 20, 10, 20),
                     decoration: BoxDecoration(

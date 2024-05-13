@@ -4,7 +4,6 @@ import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:month_picker_dialog/month_picker_dialog.dart';
@@ -66,13 +65,13 @@ class _SubmissionPageState extends State<SubmissionPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
-          print(date);
         });
         // await _loadDataForSelectedMonth();
       }
     });
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -116,13 +115,13 @@ class _SubmissionPageState extends State<SubmissionPage> {
                   builder: (context) => const RequestSubmissionPage()),
             );
           },
-          child: Text(
-            'Request Change Data',
-            style: TextStyle(color: ColorsTheme.white),
-          ),
           style: ElevatedButton.styleFrom(
             backgroundColor: ColorsTheme.primary,
             padding: EdgeInsets.symmetric(horizontal: 70.h),
+          ),
+          child: Text(
+            'Request Change Data',
+            style: TextStyle(color: ColorsTheme.white),
           ),
         ),
       ),
@@ -138,7 +137,7 @@ class _SubmissionPageState extends State<SubmissionPage> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return contentBody(false, formattedDate);
         } else if (snapshot.hasError) {
-          SchedulerBinding.instance!.addPostFrameCallback((_) {
+          SchedulerBinding.instance.addPostFrameCallback((_) {
             var snackbar = SnackBar(
               content:
                   Text('Error: ${snapshot.error}', style: alertErrorTextStyle),
@@ -158,18 +157,16 @@ class _SubmissionPageState extends State<SubmissionPage> {
   }
 
   Widget contentBody(isLoading, formattedDate) {
-    return Container(
-      child: Column(
-        children: [
-              MonthPicker(formattedDate),
-          
-          (!isLoading)
-              ? Center(child: CircularProgressIndicator())
-              : (listData.isNotEmpty)
-                  ? SingleChildScrollView()
-                  : _noData(),
-        ],
-      ),
+    return Column(
+      children: [
+            MonthPicker(formattedDate),
+        
+        (!isLoading)
+            ? const Center(child: CircularProgressIndicator())
+            : (listData.isNotEmpty)
+                ? const SingleChildScrollView()
+                : _noData(),
+      ],
     );
   }
 
@@ -201,8 +198,8 @@ class _SubmissionPageState extends State<SubmissionPage> {
           const SizedBox(
             height: 16.0,
           ),
-          Center(
-            child: const Text(
+          const Center(
+            child: Text(
               'There is no data',
               style: TextStyle(
                 fontSize: 18,
@@ -214,6 +211,7 @@ class _SubmissionPageState extends State<SubmissionPage> {
     );
   }
 
+  // ignore: non_constant_identifier_names
   Widget MonthPicker(formattedDate) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 15.w),
@@ -222,9 +220,9 @@ class _SubmissionPageState extends State<SubmissionPage> {
           _selectMonth(context);
         },
         style: TextButton.styleFrom(
-          padding: EdgeInsets.symmetric(horizontal: 5.0),
+          padding: EdgeInsets.symmetric(horizontal: 5.w),
           backgroundColor: Colors.transparent,
-          side: BorderSide(color: Colors.black, width: 1.0),
+          side: const BorderSide(color: Colors.black, width: 1.0),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -233,7 +231,7 @@ class _SubmissionPageState extends State<SubmissionPage> {
               margin: EdgeInsets.symmetric(horizontal: 5.w),
               child: Row(
                 children: <Widget>[
-                  Icon(
+                  const Icon(
                     Icons.calendar_today,
                     size: 24,
                   ),
@@ -241,12 +239,12 @@ class _SubmissionPageState extends State<SubmissionPage> {
                   Text(
                     formattedDate,
                     style:
-                        TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
+                        const TextStyle(fontSize: 18, fontWeight: FontWeight.normal),
                   ),
                 ],
               ),
             ),
-            Icon(
+            const Icon(
               Icons.arrow_drop_down,
               size: 24,
             ),
@@ -257,27 +255,14 @@ class _SubmissionPageState extends State<SubmissionPage> {
   }
 
   Widget _buildFilter() {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 10.w, bottom: 20.w),
-            child: Center(
-              child: Text(
-                "Filter",
-                style: TextStyle(
-                  color: ColorsTheme.black,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 10.w, bottom: 20.w),
+          child: Center(
             child: Text(
-              "Status",
+              "Filter",
               style: TextStyle(
                 color: ColorsTheme.black,
                 fontSize: 20.sp,
@@ -285,53 +270,64 @@ class _SubmissionPageState extends State<SubmissionPage> {
               ),
             ),
           ),
-          SizedBox(
-            height: 10.w,
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Text(
+            "Status",
+            style: TextStyle(
+              color: ColorsTheme.black,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          ...listStatus.map((status) {
-            return Column(
-              children: [
-                Container(
-                  // margin: EdgeInsets.symmetric(horizontal: 5.w),
-                  decoration: BoxDecoration(
-                    border: Border(
-                      bottom: BorderSide(
-                          color: Colors.grey.withOpacity(0.5), width: 1.0),
+        ),
+        SizedBox(
+          height: 10.w,
+        ),
+        ...listStatus.map((status) {
+          return Column(
+            children: [
+              Container(
+                // margin: EdgeInsets.symmetric(horizontal: 5.w),
+                decoration: BoxDecoration(
+                  border: Border(
+                    bottom: BorderSide(
+                        color: Colors.grey.withOpacity(0.5), width: 1.0),
+                  ),
+                ),
+                child: ListTile(
+                  onTap: () {
+                    setState(() {
+                      setFilter(status['value']);
+                    });
+                    Navigator.pop(context);
+                  },
+                  title: Text(
+                    status['name'],
+                    style: TextStyle(
+                      color: ColorsTheme.black,
+                      fontSize: 15.sp,
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-                  child: ListTile(
-                    onTap: () {
+                  trailing: Radio(
+                    value: status['value'],
+                    groupValue: selectedFilter,
+                    activeColor: const Color(0xFF6200EE),
+                    onChanged: (value) {
                       setState(() {
-                        setFilter(status['value']);
+                        setFilter(value);
                       });
                       Navigator.pop(context);
                     },
-                    title: Text(
-                      status['name'],
-                      style: TextStyle(
-                        color: ColorsTheme.black,
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                    trailing: Radio(
-                      value: status['value'],
-                      groupValue: selectedFilter,
-                      activeColor: Color(0xFF6200EE),
-                      onChanged: (value) {
-                        setState(() {
-                          setFilter(value);
-                        });
-                        Navigator.pop(context);
-                      },
-                    ),
                   ),
                 ),
-              ],
-            );
-          }).toList(),
-        ],
-      ),
+              ),
+            ],
+          );
+        }),
+      ],
     );
   }
 }

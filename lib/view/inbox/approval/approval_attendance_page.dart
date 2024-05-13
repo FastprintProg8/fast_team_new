@@ -1,5 +1,6 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:Fast_Team/view/inbox/detail/detail_attendence_page.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -7,13 +8,11 @@ import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:Fast_Team/controller/inbox_controller.dart';
-import 'package:shimmer/shimmer.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class ApprovalAttendancePage extends StatefulWidget {
-  const ApprovalAttendancePage({Key? key}) : super(key: key);
+  const ApprovalAttendancePage({super.key});
 
   @override
   State<ApprovalAttendancePage> createState() => _ApprovalAttendancePageState();
@@ -158,7 +157,7 @@ class _ApprovalAttendancePageState extends State<ApprovalAttendancePage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _body(false);
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
                   content: Text('Error: ${snapshot.error}',
                       style: alertErrorTextStyle),
@@ -181,8 +180,8 @@ class _ApprovalAttendancePageState extends State<ApprovalAttendancePage> {
     return RefreshWidget(
       onRefresh: refreshItem,
       child: (!loading)
-          ? Center(child: CircularProgressIndicator())
-          : (attendanceList.length != 0)? ListView.builder(
+          ? const Center(child: CircularProgressIndicator())
+          : (attendanceList.isNotEmpty)? ListView.builder(
               itemCount: attendanceList.length,
               shrinkWrap: true,
               physics: const ClampingScrollPhysics(),
@@ -204,27 +203,14 @@ class _ApprovalAttendancePageState extends State<ApprovalAttendancePage> {
   }
 
   Widget _buildFilter() {
-    return Container(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            margin: EdgeInsets.only(top: 10.w, bottom: 20.w),
-            child: Center(
-              child: Text(
-                "Filter",
-                style: TextStyle(
-                  color: ColorsTheme.black,
-                  fontSize: 20.sp,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.symmetric(horizontal: 20.w),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          margin: EdgeInsets.only(top: 10.w, bottom: 20.w),
+          child: Center(
             child: Text(
-              "Status",
+              "Filter",
               style: TextStyle(
                 color: ColorsTheme.black,
                 fontSize: 20.sp,
@@ -232,149 +218,160 @@ class _ApprovalAttendancePageState extends State<ApprovalAttendancePage> {
               ),
             ),
           ),
-          SizedBox(height: 20.w),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+        ),
+        Container(
+          margin: EdgeInsets.symmetric(horizontal: 20.w),
+          child: Text(
+            "Status",
+            style: TextStyle(
+              color: ColorsTheme.black,
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        SizedBox(height: 20.w),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(4);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "All Status",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 4,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(4);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "All Status",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 4,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+            ),
+            const Divider(),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(0);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "Pending",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 0,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(0);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "Pending",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 0,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+            ),
+            const Divider(),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(1);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "Approved",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 1,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(1);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "Approved",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 1,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-          Column(
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 5.w),
-                child: ListTile(
-                  onTap: () {
+            ),
+            const Divider(),
+          ],
+        ),
+        Column(
+          children: [
+            Container(
+              margin: EdgeInsets.symmetric(horizontal: 5.w),
+              child: ListTile(
+                onTap: () {
+                  setState(() {
+                    setFilter(2);
+                  });
+                  Navigator.pop(context);
+                },
+                title: Text(
+                  "Rejected",
+                  style: TextStyle(
+                    color: ColorsTheme.black,
+                    fontSize: 15.sp,
+                    fontWeight: FontWeight.w400,
+                  ),
+                ),
+                trailing: Radio(
+                  value: 2,
+                  groupValue: selectedFilter,
+                  activeColor: const Color(0xFF6200EE),
+                  onChanged: (value) {
                     setState(() {
-                      setFilter(2);
+                      setFilter(value);
                     });
                     Navigator.pop(context);
                   },
-                  title: Text(
-                    "Rejected",
-                    style: TextStyle(
-                      color: ColorsTheme.black,
-                      fontSize: 15.sp,
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  trailing: Radio(
-                    value: 2,
-                    groupValue: selectedFilter,
-                    activeColor: Color(0xFF6200EE),
-                    onChanged: (value) {
-                      setState(() {
-                        setFilter(value);
-                      });
-                      Navigator.pop(context);
-                    },
-                  ),
                 ),
               ),
-              Divider(),
-            ],
-          ),
-        ],
-      ),
+            ),
+            const Divider(),
+          ],
+        ),
+      ],
     );
   }
 
@@ -416,132 +413,130 @@ class _ApprovalAttendancePageState extends State<ApprovalAttendancePage> {
   Widget _attendanceTile(attendance, formattedTime, formattedDate) {
     return Column(
       children: [
-        Container(
-          child: InkWell(
-            onTap: () async {
-              // final Uri url = Uri.parse(attendance['bukti']);
-              // await launchUrl(url);
-              Navigator.pushNamed(context, '/attendenceDetail', arguments: {
-                'tanggal': formattedDate,
-                'time': DateFormat.Hms()
-                    .parse("${attendance['tanggal'].toString().split(' ')[1]}"),
-                'status': attendance['status'],
-                'bukti': attendance['bukti'],
-                'jenis': attendance['jenis'],
-                'nama': attendance['user']['name'],
-                'photo': attendance['user']['photo'],
-              });
-            },
-            child: Container(
-              padding: EdgeInsets.all(9.w),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Padding(
-                            padding: EdgeInsets.only(left: 8.w),
-                            child: Row(
-                              children: [
-                                Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Icon(
-                                      MdiIcons.calendarMonth,
-                                      size: 25.sp,
-                                    ),
-                                    SizedBox(
-                                      height: 5.w,
-                                    ),
-                                    Icon(
-                                      MdiIcons.clockOutline,
-                                      size: 25.sp,
-                                    ),
-                                  ],
-                                ),
-                                SizedBox(
-                                  width: 10.w,
-                                ),
-                                Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceAround,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: <Widget>[
-                                    Text(
-                                      formattedDate,
-                                      style: TextStyle(
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 15.sp),
-                                    ),
-                                    SizedBox(
-                                      height: 10.w,
-                                    ),
-                                    Text(
-                                      formattedTime,
-                                      style: TextStyle(
-                                        color: Colors.black45,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      SizedBox(
-                        height: 5.w,
-                      ),
-                      Row(
-                        children: [
-                          SizedBox(
-                            width: 45.w,
-                          ),
-                          Container(
-                            padding: EdgeInsets.symmetric(horizontal: 10.w),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.circular(20.0),
-                                border: Border.all(color: Colors.blueAccent)),
-                            child: Text(
-                              "Request For ${attendance['jenis'].toString().capitalizeFirst}",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Colors.blueAccent,
-                                fontSize: 10.sp,
+        InkWell(
+          onTap: () async {
+            // final Uri url = Uri.parse(attendance['bukti']);
+            // await launchUrl(url);
+            Navigator.pushNamed(context, '/attendenceDetail', arguments: {
+              'tanggal': formattedDate,
+              'time': DateFormat.Hms()
+                  .parse(attendance['tanggal'].toString().split(' ')[1]),
+              'status': attendance['status'],
+              'bukti': attendance['bukti'],
+              'jenis': attendance['jenis'],
+              'nama': attendance['user']['name'],
+              'photo': attendance['user']['photo'],
+            });
+          },
+          child: Container(
+            padding: EdgeInsets.all(9.w),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Padding(
+                          padding: EdgeInsets.only(left: 8.w),
+                          child: Row(
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Icon(
+                                    MdiIcons.calendarMonth,
+                                    size: 25.sp,
+                                  ),
+                                  SizedBox(
+                                    height: 5.w,
+                                  ),
+                                  Icon(
+                                    MdiIcons.clockOutline,
+                                    size: 25.sp,
+                                  ),
+                                ],
                               ),
+                              SizedBox(
+                                width: 10.w,
+                              ),
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: <Widget>[
+                                  Text(
+                                    formattedDate,
+                                    style: TextStyle(
+                                        color: Colors.blue,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15.sp),
+                                  ),
+                                  SizedBox(
+                                    height: 10.w,
+                                  ),
+                                  Text(
+                                    formattedTime,
+                                    style: const TextStyle(
+                                      color: Colors.black45,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 5.w,
+                    ),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 45.w,
+                        ),
+                        Container(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.circular(20.0),
+                              border: Border.all(color: Colors.blueAccent)),
+                          child: Text(
+                            "Request For ${attendance['jenis'].toString().capitalizeFirst}",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 10.sp,
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Container(
-                    width: 80.w,
-                    padding: EdgeInsets.all(6.w),
-                    decoration: BoxDecoration(
-                      color: getStatusColor(attendance['status']),
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(20.0),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      getStatusText(attendance['status']),
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: (attendance['status'] == 0)
-                              ? ColorsTheme.black
-                              : ColorsTheme.white),
-                    ),
+                  ],
+                ),
+                Container(
+                  width: 80.w,
+                  padding: EdgeInsets.all(6.w),
+                  decoration: BoxDecoration(
+                    color: getStatusColor(attendance['status']),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.circular(20.0),
                   ),
-                ],
-              ),
+                  child: Text(
+                    getStatusText(attendance['status']),
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                        color: (attendance['status'] == 0)
+                            ? ColorsTheme.black
+                            : ColorsTheme.white),
+                  ),
+                ),
+              ],
             ),
           ),
         ),

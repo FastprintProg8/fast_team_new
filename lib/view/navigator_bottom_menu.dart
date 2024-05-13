@@ -13,7 +13,7 @@ import 'package:get/get.dart';
 import 'home.dart';
 
 class NavigatorBottomMenu extends StatefulWidget {
-  const NavigatorBottomMenu({Key? key}) : super(key: key);
+  const NavigatorBottomMenu({super.key});
 
   @override
   State<NavigatorBottomMenu> createState() => _NavigatorBottomMenuState();
@@ -21,12 +21,10 @@ class NavigatorBottomMenu extends StatefulWidget {
 
 class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
   DateTime? currentBackPressedTime;
-  static const backPressedDuration = Duration(seconds: 2);
   var selectedIndex = 0.obs;
   var data = false.obs;
   Map<String, dynamic>? args;
   List<dynamic> notMainMenu = [{'data': 0}];
-  @override
   moveToMenu(index) async {
     args = null;
     selectedIndex.value = index;
@@ -40,6 +38,7 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
       currentBackPressedTime = now;
       ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Tekan sekali lagi untuk keluar...")));
+      // ignore: void_checks
       return Future.value(false);
     } else {
       SystemNavigator.pop();
@@ -47,6 +46,7 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>?;
     if (notMainMenu.length == 1 && args != null) {
@@ -59,17 +59,18 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
     Widget navigationMenu() {
       return Obx(
         () {
+          // ignore: deprecated_member_use
           var willPopScope2 = WillPopScope(
             // child:HomePage(),
             child: (selectedIndex.value == 0)
-                ? HomePage()
+                ? const HomePage()
                 : (selectedIndex.value == 1)
-                    ? EmployeePage()
+                    ? const EmployeePage()
                     : (selectedIndex.value == 3)
-                        ? InboxPage()
+                        ? const InboxPage()
                         : (selectedIndex.value == 2)
-                            ? ScheduleRequestPage()
-                            : AccountPage(),
+                            ? const ScheduleRequestPage()
+                            : const AccountPage(),
             onWillPop: () async {
               DateTime now = DateTime.now();
               if (currentBackPressedTime == null ||
@@ -93,7 +94,7 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
     }
 
     Widget itemNavigation() => NavigationBarTheme(
-          data: NavigationBarThemeData(),
+          data: const NavigationBarThemeData(),
           child: NavigationBar(
             height: 50.w,
             backgroundColor: ColorsTheme.white,
@@ -102,7 +103,7 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
               moveToMenu(index);
               
             }),
-            destinations: [
+            destinations: const [
               NavigationDestination(
                 icon: Icon(Icons.home),
                 label: 'Home',

@@ -1,12 +1,10 @@
+// ignore_for_file: depend_on_referenced_packages, prefer_typing_uninitialized_variables, non_constant_identifier_names, use_build_context_synchronously
+
 import 'dart:async';
-import 'dart:convert';
 import 'package:Fast_Team/controller/account_controller.dart';
 import 'package:Fast_Team/controller/home_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
-import 'package:Fast_Team/model/user_model.dart';
-import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:Fast_Team/user/controllerApi.dart';
 import 'package:Fast_Team/widget/header_background_home.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -14,18 +12,14 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:Fast_Team/user/controllerApi.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:shimmer/shimmer.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -84,7 +78,6 @@ class _HomePageState extends State<HomePage> {
     fontWeight: FontWeight.w500,
     color: ColorsTheme.black,
   );
-  int _currentIndex = 0;
   bool isLoading = true;
   bool moreData = true;
 
@@ -222,6 +215,7 @@ class _HomePageState extends State<HomePage> {
         isLoading = true;
       });
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
   }
@@ -285,6 +279,7 @@ class _HomePageState extends State<HomePage> {
         memberData = resultMember;
       });
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
   }
@@ -318,7 +313,7 @@ class _HomePageState extends State<HomePage> {
         Map<String, dynamic> result = await homeController!
             .getListBelumAbsen(currentDate, int.parse(_selectedFilter));
         List<dynamic> listData = result['details']['data'];
-        if (listData != null && listData.length > 5) {
+        if (listData.length > 5) {
           listData = listData.sublist(0, 5);
         } else {
           listData = listData.sublist(0, listData.length);
@@ -330,6 +325,7 @@ class _HomePageState extends State<HomePage> {
         return listData;
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
       return [];
     }
@@ -343,32 +339,13 @@ class _HomePageState extends State<HomePage> {
     return listData.length;
   }
 
-  Future<void> _reloadData() async {
-    setState(() {
-      isLoading = true;
-    });
-
-    try {
-      var fetch = await _fetchData();
-
-      setState(() {
-        ListDataEmployee = fetch;
-        isLoading = false;
-      });
-    } catch (e) {
-      print(e);
-      setState(() {
-        isLoading = false;
-      });
-    }
-  }
 
   void _clockIn(BuildContext context) async {
     LocationPermission permission = await Geolocator.requestPermission();
 
     if (permission == LocationPermission.denied) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Izin lokasi ditolak oleh pengguna.'),
         ),
       );
@@ -382,7 +359,7 @@ class _HomePageState extends State<HomePage> {
 
     if (permission == LocationPermission.denied) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Izin lokasi ditolak oleh pengguna.'),
         ),
       );
@@ -456,8 +433,7 @@ class _HomePageState extends State<HomePage> {
           moreData = false;
         });
       } else {
-        if (listData != null &&
-            (ListDataEmployee.length + 5) < listData.length) {
+        if ((ListDataEmployee.length + 5) < listData.length) {
           listData = listData.sublist(startList, endList);
         } else {
           // listData = listData.sublist(startList, endList);
@@ -513,7 +489,7 @@ class _HomePageState extends State<HomePage> {
                 : null,
             style: ElevatedButton.styleFrom(
               backgroundColor:
-                  status ? Color.fromARGB(255, 2, 65, 128) : Colors.grey,
+                  status ? const Color.fromARGB(255, 2, 65, 128) : Colors.grey,
             ),
             child: Row(
               children: <Widget>[
@@ -540,7 +516,7 @@ class _HomePageState extends State<HomePage> {
               color: Colors.grey.withOpacity(0.5),
               spreadRadius: 5,
               blurRadius: 7,
-              offset: Offset(0, 3), // changes position of shadow
+              offset: const Offset(0, 3), // changes position of shadow
             ),
           ],
         ),
@@ -550,23 +526,23 @@ class _HomePageState extends State<HomePage> {
             decoration: const BoxDecoration(
               border: Border(
                 bottom:
-                    BorderSide(color: const Color.fromARGB(255, 2, 65, 128)),
+                    BorderSide(color: Color.fromARGB(255, 2, 65, 128)),
               ),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8.w),
                   child: (statusLoading)
                       ? loadingData(1)
                       : Text(
-                          '${kantor} ${getCurrentDay()}',
+                          '$kantor ${getCurrentDay()}',
                           style: TextStyle(color: ColorsTheme.secondary),
                         ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8.w),
                   child: Row(
                     children: (statusLoading)
                         ? [loadingData(3)]
@@ -615,10 +591,10 @@ class _HomePageState extends State<HomePage> {
 
     Widget headerUsername(statusLoading) {
       Widget loadingAvatar() => Shimmer.fromColors(
-            child:
-                CircleAvatar(backgroundColor: ColorsTheme.black, radius: 100.r),
             baseColor: ColorsTheme.secondary!,
             highlightColor: ColorsTheme.lightGrey2!,
+            child:
+                CircleAvatar(backgroundColor: ColorsTheme.black, radius: 100.r),
           );
 
       return SizedBox(
@@ -653,7 +629,7 @@ class _HomePageState extends State<HomePage> {
                                 loadingData(1),
                               ]
                             : [
-                                Container(
+                                SizedBox(
                                   width: 200.w,
                                   child:
                                       Text('$nama', style: headerStyle(false)),
@@ -702,12 +678,12 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.grey.withOpacity(0.2),
                       spreadRadius: 5,
                       blurRadius: 7,
-                      offset: Offset(0, 3), // changes position of shadow
+                      offset: const Offset(0, 3), // changes position of shadow
                     ),
                   ],
                 ),
                 child: (status == "Attendance")
-                    ? Icon(
+                    ? const Icon(
                         Icons.list_alt,
                         color: Colors.blue,
                         size: 30, // Ukuran ikon
@@ -719,17 +695,17 @@ class _HomePageState extends State<HomePage> {
                             size: 30, // Ukuran ikon
                           )
                         : (status == "Payslip")
-                            ? Icon(
+                            ? const Icon(
                                 Icons.attach_money,
                                 color: Colors.pink,
                                 size: 30, // Ukuran ikon
                               )
-                            : Icon(
+                            : const Icon(
                                 Icons.history,
                                 color: Colors.amber,
                                 size: 30, // Ukuran ikon
                               )),
-            SizedBox(height: 5),
+            SizedBox(height: 5.w),
             Text(
               (status == "Attendance")
                   ? 'Attendance\nLog'
@@ -778,10 +754,10 @@ class _HomePageState extends State<HomePage> {
 
     Widget ListEmployee(datalist, loading) {
       Widget loadingAvatar() => Shimmer.fromColors(
-            child:
-                CircleAvatar(backgroundColor: ColorsTheme.black, radius: 30.r),
             baseColor: ColorsTheme.secondary!,
             highlightColor: ColorsTheme.lightGrey2!,
+            child:
+                CircleAvatar(backgroundColor: ColorsTheme.black, radius: 30.r),
           );
       Widget loadingData(statusComponent) => Shimmer.fromColors(
           baseColor: ColorsTheme.secondary!,
@@ -811,7 +787,7 @@ class _HomePageState extends State<HomePage> {
                 color: Colors.grey.withOpacity(0.2),
                 spreadRadius: 5,
                 blurRadius: 7,
-                offset: Offset(0, 3), // changes position of shadow
+                offset: const Offset(0, 3), // changes position of shadow
               ),
             ],
           ),
@@ -823,6 +799,8 @@ class _HomePageState extends State<HomePage> {
                   margin:
                       EdgeInsets.symmetric(vertical: 10.h, horizontal: 10.w),
                   child: CircleAvatar(
+                    radius: 21.r,
+                    backgroundColor: ColorsTheme.lightGrey3,
                     child: (loading)
                         ? loadingAvatar()
                         : CircleAvatar(
@@ -839,8 +817,6 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                    radius: 21.r,
-                    backgroundColor: ColorsTheme.lightGrey3,
                   ),
                 ),
                 Column(
@@ -854,7 +830,7 @@ class _HomePageState extends State<HomePage> {
                           loadingData(2)
                         ]
                       : [
-                          Container(
+                          SizedBox(
                             width: 150.w,
                             child: Text(
                               datalist['nama'],
@@ -874,7 +850,7 @@ class _HomePageState extends State<HomePage> {
                         color: (datalist['clock_in'] == 1)
                             ? ColorsTheme.lightGreen
                             : ColorsTheme.lightGrey),
-                    SizedBox(width: 8),
+                    SizedBox(width: 8.w),
                     Icon(Icons.output,
                         color: (datalist['clock_out'] == 1)
                             ? ColorsTheme.lightRed
@@ -889,24 +865,24 @@ class _HomePageState extends State<HomePage> {
     Widget ListAbsens() {
       return Container(
         margin: EdgeInsets.symmetric(horizontal: 10.w),
-        padding: EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(8.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                             color: Color.fromARGB(255, 2, 65, 128), width: 3.0),
                       ),
                     ),
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8.w),
                     child: RichText(
-                      text: TextSpan(
+                      text: const TextSpan(
                         text: 'List',
                         style: TextStyle(
                           fontSize: 24,
@@ -926,9 +902,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: 8.w),
               child: Container(
-                padding: EdgeInsets.only(left: 10, right: 10),
+                padding: EdgeInsets.only(left: 10.w, right: 10.w),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.grey),
@@ -950,7 +926,7 @@ class _HomePageState extends State<HomePage> {
                       value: 'All',
                       child: Text(
                         'All',
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 16.sp),
                       ),
                     ),
                     ...divisiList.map<DropdownMenuItem<String>>(
@@ -959,10 +935,10 @@ class _HomePageState extends State<HomePage> {
                         value: divisi['id'].toString(),
                         child: Text(
                           divisi['name'],
-                          style: TextStyle(fontSize: 16),
+                          style: TextStyle(fontSize: 16.sp),
                         ),
                       );
-                    }).toList(),
+                    }),
                   ],
                 ),
               ),
@@ -981,8 +957,8 @@ class _HomePageState extends State<HomePage> {
                         padding: EdgeInsets.symmetric(vertical: 10.w),
                         child: Center(
                           child: (moreData)
-                              ? CircularProgressIndicator()
-                              : Text('No more data'),
+                              ? const CircularProgressIndicator()
+                              : const Text('No more data'),
                         ));
                   }
                 })
@@ -1001,15 +977,15 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Headers(),
                   Positioned(
+                    top: 2.h,
+                    left: 20.w,
+                    right: 20.w,
                     child: Column(
                       children: [
                         headerUsername(statusLoading),
                         SizedBox(height: 16.h),
                       ],
                     ),
-                    top: 2.h,
-                    left: 20.w,
-                    right: 20.w,
                   ),
                 ],
               ),
@@ -1024,7 +1000,7 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return contentLoadedData(false);
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
                   content: Text('Error: ${snapshot.error}',
                       style: alertErrorTextStyle),
@@ -1045,31 +1021,31 @@ class _HomePageState extends State<HomePage> {
     Widget ListMemberAbsens() {
       return Container(
         margin: EdgeInsets.symmetric(horizontal: 10.w),
-        padding: EdgeInsets.symmetric(horizontal: 8),
+        padding: EdgeInsets.symmetric(horizontal: 8.w),
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(8.w),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Container(
-                    decoration: BoxDecoration(
+                    decoration: const BoxDecoration(
                       border: Border(
                         bottom: BorderSide(
                             color: Color.fromARGB(255, 2, 65, 128), width: 3.0),
                       ),
                     ),
-                    padding: EdgeInsets.all(8),
+                    padding: EdgeInsets.all(8.w),
                     child: RichText(
                       text: TextSpan(
                         text: 'List',
                         style: TextStyle(
-                          fontSize: 24,
-                          color: Color.fromARGB(255, 2, 65, 128),
+                          fontSize: 24.sp,
+                          color: const Color.fromARGB(255, 2, 65, 128),
                           fontWeight: FontWeight.bold,
                         ),
-                        children: <TextSpan>[
+                        children: const <TextSpan>[
                           TextSpan(
                             text: ' Member Division',
                             style: TextStyle(color: Colors.black),
@@ -1082,7 +1058,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
-              padding: EdgeInsets.only(left: 8),
+              padding: EdgeInsets.only(left: 8.w),
               child: InkWell(
                 onTap: () async {
                   Navigator.pushNamed(context, '/listMember',
@@ -1100,7 +1076,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.grey.withOpacity(0.2),
                                   spreadRadius: 5,
                                   blurRadius: 7,
-                                  offset: Offset(
+                                  offset: const Offset(
                                       0, 3), // changes position of shadow
                                 ),
                               ],
@@ -1115,7 +1091,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.grey.withOpacity(0.2),
                                   spreadRadius: 5,
                                   blurRadius: 7,
-                                  offset: Offset(
+                                  offset:const  Offset(
                                       0, 3), // changes position of shadow
                                 ),
                               ],
@@ -1172,7 +1148,7 @@ class _HomePageState extends State<HomePage> {
                                 Container(
                                     margin: EdgeInsets.symmetric(
                                         horizontal: 20.w, vertical: 10.w),
-                                    child: Icon(Icons.arrow_forward_ios)),
+                                    child: const Icon(Icons.arrow_forward_ios)),
                               ],
                             ),
                           )),
@@ -1282,6 +1258,7 @@ class _HomePageState extends State<HomePage> {
       );
     }
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         return Future.value(false);
@@ -1310,9 +1287,9 @@ class _HomePageState extends State<HomePage> {
   void showFilterDropdown(BuildContext context) async {
     final result = await showMenu(
       context: context,
-      position: RelativeRect.fromLTRB(0, 0, 0, 0),
+      position: const RelativeRect.fromLTRB(0, 0, 0, 0),
       items: [
-        PopupMenuItem<String>(
+        const PopupMenuItem<String>(
           value: 'All',
           child: Text('All', style: TextStyle(fontSize: 16)),
         ),
@@ -1320,10 +1297,10 @@ class _HomePageState extends State<HomePage> {
           (Map<String, dynamic> divisi) {
             return PopupMenuItem<String>(
               value: divisi['id'].toString(),
-              child: Text(divisi['name'], style: TextStyle(fontSize: 16)),
+              child: Text(divisi['name'], style: const TextStyle(fontSize: 16)),
             );
           },
-        ).toList(),
+        ),
       ],
       elevation: 8.0,
     );
@@ -1340,7 +1317,6 @@ class _HomePageState extends State<HomePage> {
 
   void onTabTapped(int index) {
     setState(() {
-      _currentIndex = index;
     });
   }
 }

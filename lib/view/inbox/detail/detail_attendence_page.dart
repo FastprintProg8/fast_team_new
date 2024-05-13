@@ -1,8 +1,6 @@
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -84,12 +82,11 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
-                      Container(
-                          child: CircleAvatar(
+                      CircleAvatar(
                         radius: 30.r,
                         backgroundImage: NetworkImage(
                             "http://103.29.214.154:9002/assets/imgUserProfile/${photo!}"),
-                      )),
+                      ),
                       Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,17 +114,16 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                        child: Column(
+                    Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Your attendance on ${tanggal} at ${time}, type '${jenis!.toUpperCase()}', has ${getStatusText(status!)} status.",
+                          "Your attendance on $tanggal at $time, type '${jenis!.toUpperCase()}', has ${getStatusText(status!)} status.",
                           style: TextStyle(fontSize: 14.sp),
                         ),
                         SizedBox(height: 6.h),
                         Text(
-                          "Detail Attendance :\nDate : ${tanggal} \nTime : ${time} \nType : ${jenis!.toUpperCase()} \nStatus : ${getStatusText(status!)} ",
+                          "Detail Attendance :\nDate : $tanggal \nTime : $time \nType : ${jenis!.toUpperCase()} \nStatus : ${getStatusText(status!)} ",
                           style: TextStyle(fontSize: 14.sp),
                         ),
                         RichText(
@@ -151,7 +147,7 @@ class _AttendanceDetailPageState extends State<AttendanceDetailPage> {
                           ),
                         ),
                       ],
-                    )),
+                    ),
                   ],
                 ),
               ),

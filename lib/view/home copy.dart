@@ -1,10 +1,8 @@
+// ignore_for_file: depend_on_referenced_packages
 import 'dart:async';
-import 'dart:convert';
 import 'package:Fast_Team/controller/account_controller.dart';
 import 'package:Fast_Team/controller/home_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
-import 'package:Fast_Team/model/user_model.dart';
-import 'package:Fast_Team/server/local/local_session.dart';
 import 'package:Fast_Team/style/color_theme.dart';
 import 'package:Fast_Team/widget/header_background_home.dart';
 import 'package:Fast_Team/widget/refresh_widget.dart';
@@ -13,18 +11,14 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:geolocator/geolocator.dart';
 // import 'package:Fast_Team/user/controllerApi.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:shimmer/shimmer.dart';
-import 'package:sticky_headers/sticky_headers.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -85,7 +79,6 @@ class _HomePageState extends State<HomePage> {
     fontWeight: FontWeight.w500,
     color: ColorsTheme.black,
   );
-  int _currentIndex = 0;
   bool isLoading = true;
   bool moreData = true;
 
@@ -309,7 +302,7 @@ class _HomePageState extends State<HomePage> {
         Map<String, dynamic> result = await homeController!
             .getListBelumAbsen(currentDate, int.parse(_selectedFilter));
         List<dynamic> listData = result['details']['data'];
-        if (listData != null && listData.length > 5) {
+        if (listData.length > 5) {
           listData = listData.sublist(0, 5);
         } else {
           listData = listData.sublist(0, listData.length);
@@ -451,8 +444,7 @@ class _HomePageState extends State<HomePage> {
           moreData = false;
         });
       } else {
-        if (listData != null &&
-            (ListDataEmployee.length + 5) < listData.length) {
+        if ((ListDataEmployee.length + 5) < listData.length) {
           listData = listData.sublist(startList, endList);
         } else {
           // listData = listData.sublist(startList, endList);
@@ -1016,7 +1008,7 @@ class _HomePageState extends State<HomePage> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return contentLoadedData(false);
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
                   content: Text('Error: ${snapshot.error}',
                       style: alertErrorTextStyle),
@@ -1243,7 +1235,6 @@ class _HomePageState extends State<HomePage> {
 
   void onTabTapped(int index) {
     setState(() {
-      _currentIndex = index;
     });
   }
 }

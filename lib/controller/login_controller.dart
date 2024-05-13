@@ -37,7 +37,7 @@ class LoginController extends GetxController {
 
   requestResetPassword(email) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var token = prefs.getString('token');
+    prefs.getString('token');
     var result = await loginNetUtils.requestResetPassword(email);
 
     return ResponseHelper().jsonResponse(result);
@@ -46,8 +46,8 @@ class LoginController extends GetxController {
   requestChangePassword(password) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    var id_user = prefs.getInt('user-id_user');
-    var result = await loginNetUtils.requestChangePassword(token, id_user, password);
+    var idUser = prefs.getInt('user-id_user');
+    var result = await loginNetUtils.requestChangePassword(token, idUser, password);
     // print(result);
     return ResponseHelper().jsonResponse(result);
   }

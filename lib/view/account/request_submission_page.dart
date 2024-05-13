@@ -1,9 +1,8 @@
+// ignore_for_file: prefer_typing_uninitialized_variables
+
 import 'package:Fast_Team/controller/account_controller.dart';
 import 'package:Fast_Team/model/account_information_model.dart';
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:Fast_Team/view/account/submission_page.dart';
-import 'package:Fast_Team/widget/refresh_widget.dart';
-import 'package:Fast_Team/widget/selected_form.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -184,6 +183,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
     ];
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -211,7 +211,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return contentBody();
           } else if (snapshot.hasError) {
-            SchedulerBinding.instance!.addPostFrameCallback((_) {
+            SchedulerBinding.instance.addPostFrameCallback((_) {
               var snackbar = SnackBar(
                 content: Text('Error: ${snapshot.error}',
                     style: alertErrorTextStyle),
@@ -256,19 +256,19 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
   }
 
   Widget floatingButton(BuildContext context, String label, Color color,
-      Color color_label, VoidCallback onPressed) {
+      Color colorLabel, VoidCallback onPressed) {
     return Container(
       width: MediaQuery.of(context).size.width,
-      margin: EdgeInsets.symmetric(horizontal: 10),
+      margin: EdgeInsets.symmetric(horizontal: 10.w),
       child: ElevatedButton(
         onPressed: onPressed,
-        child: Text(
-          label,
-          style: TextStyle(color: color_label),
-        ),
         style: ElevatedButton.styleFrom(
           backgroundColor:
               color, // Menggunakan warna yang diberikan sebagai warna latar belakang tombol
+        ),
+        child: Text(
+          label,
+          style: TextStyle(color: colorLabel),
         ),
       ),
     );
@@ -287,7 +287,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
               labelStyle: TextStyle(
                 color: ColorsTheme.black, // Warna label yang ditetapkan
               ),
-              prefixIcon: Icon(Icons.article),
+              prefixIcon: const Icon(Icons.article),
             ),
             // onChanged: (){},
             // initialValue: value,
@@ -441,7 +441,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
         labelStyle: TextStyle(
           color: ColorsTheme.black, // Warna label yang ditetapkan
         ),
-        prefixIcon: Icon(Icons.edit),
+        prefixIcon: const Icon(Icons.edit),
       ),
       // onChanged: (){},
       // initialValue: value,
@@ -471,7 +471,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
         labelStyle: TextStyle(
           color: ColorsTheme.black, // Warna label yang ditetapkan
         ),
-        prefixIcon: Icon(Icons.edit),
+        prefixIcon: const Icon(Icons.edit),
       ),
       keyboardType: TextInputType.number,
       inputFormatters: <TextInputFormatter>[
@@ -489,7 +489,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
         labelStyle: TextStyle(
           color: ColorsTheme.black, // Warna label yang ditetapkan
         ),
-        prefixIcon: Icon(Icons.edit),
+        prefixIcon: const Icon(Icons.edit),
       ),
       validator: (value) {
         if (value == null ||
@@ -544,7 +544,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
       margin: EdgeInsets.only(top: 10.w),
       child: DropdownButtonFormField<Map<String, dynamic>>(
         isExpanded: true,
-        decoration: InputDecoration(
+        decoration: const InputDecoration(
           labelText: 'Change To',
           labelStyle: TextStyle(
             color: Colors.black,
@@ -587,7 +587,7 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
           labelStyle: TextStyle(
             color: ColorsTheme.black, // Warna label yang ditetapkan
           ),
-          prefixIcon: Icon(Icons.assignment),
+          prefixIcon: const Icon(Icons.assignment),
         ),
         items: items
             .map((item) => DropdownMenuItem<Map<String, dynamic>>(
@@ -601,7 +601,6 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
             change = null;
             selectedItem = item;
             selectedNum = item!['no'];
-            print(selectedNum);
           });
         },
         selectedItemBuilder: (BuildContext context) {

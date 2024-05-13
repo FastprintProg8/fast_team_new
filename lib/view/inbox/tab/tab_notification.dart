@@ -152,7 +152,7 @@ class _TabNotificationPageState extends State<TabNotificationPage>
             if (snapshot.connectionState == ConnectionState.waiting) {
               return _body(false);
             } else if (snapshot.hasError) {
-              SchedulerBinding.instance!.addPostFrameCallback((_) {
+              SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
                   content: Text('Error: ${snapshot.error}',
                       style: alertErrorTextStyle),
@@ -175,7 +175,7 @@ class _TabNotificationPageState extends State<TabNotificationPage>
     return RefreshWidget(
       onRefresh: refreshItem,
       child: (!isLoading)
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : (notificationList.isNotEmpty)
               ? ListView(
                   children: [_notificationList()],

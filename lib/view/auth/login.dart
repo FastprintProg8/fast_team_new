@@ -1,13 +1,13 @@
+// ignore_for_file: library_private_types_in_public_api, use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:Fast_Team/user/controllerApi.dart';
-import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:page_transition/page_transition.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
 import 'package:http/http.dart' as http;
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
@@ -34,11 +34,11 @@ class _LoginPageState extends State<LoginPage> {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('Login Failed'),
-            content: Text('Email atau Password salah'),
+            title: const Text('Login Failed'),
+            content: const Text('Email atau Password salah'),
             actions: [
               TextButton(
-                child: Text('OK'),
+                child: const Text('OK'),
                 onPressed: () {
                   Navigator.pop(context);
                 },
@@ -48,15 +48,16 @@ class _LoginPageState extends State<LoginPage> {
         );
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('Server dalam gangguan'),
+          title: const Text('Error'),
+          content: const Text('Server dalam gangguan'),
           actions: [
             TextButton(
-              child: Text('OK'),
+              child: const Text('OK'),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -81,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: EdgeInsets.all(20),
+                padding: EdgeInsets.all(20.w),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.circular(8),
@@ -90,7 +91,7 @@ class _LoginPageState extends State<LoginPage> {
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -122,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
                             filled: true,
                             fillColor: Colors.white,
                             hintText: 'Email',
-                            prefixIcon: Icon(Icons.email),
+                            prefixIcon: const Icon(Icons.email),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -135,7 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                             filled: true,
                             fillColor: Colors.white,
                             hintText: 'Password',
-                            prefixIcon: Icon(Icons.lock),
+                            prefixIcon: const Icon(Icons.lock),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(8.0),
                             ),
@@ -155,12 +156,12 @@ class _LoginPageState extends State<LoginPage> {
                                     showDialog(
                                       context: context,
                                       builder: (context) => AlertDialog(
-                                        title: Text('Error'),
-                                        content: Text(
+                                        title: const Text('Error'),
+                                        content: const Text(
                                             'Please enter your email and password'),
                                         actions: [
                                           TextButton(
-                                            child: Text('OK'),
+                                            child: const Text('OK'),
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
@@ -174,21 +175,21 @@ class _LoginPageState extends State<LoginPage> {
                               ? Text(
                                   'Loading',
                                   style: TextStyle(
-                                    fontSize: 18.0,
+                                    fontSize: 18.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 )
                               : Text(
                                   'Login',
                                   style: TextStyle(
-                                    fontSize: 18.0,
+                                    fontSize: 18.sp,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                         ),
                         // Garis pembatas
                         Container(
-                          margin: EdgeInsets.symmetric(vertical: 16.0),
+                          margin: EdgeInsets.symmetric(vertical: 16.w),
                           height: 1.0,
                           color: Colors.grey,
                         ),
@@ -203,11 +204,11 @@ class _LoginPageState extends State<LoginPage> {
                                     ''; // Variabel untuk menyimpan alamat email
 
                                 return AlertDialog(
-                                  title: Text('Forgot Password'),
+                                  title: const Text('Forgot Password'),
                                   contentPadding: EdgeInsets.symmetric(
-                                      vertical: 24.0,
+                                      vertical: 24.w,
                                       horizontal:
-                                          16.0), // Sesuaikan ukuran padding sesuai kebutuhan
+                                          16.w), // Sesuaikan ukuran padding sesuai kebutuhan
                                   content: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -219,14 +220,14 @@ class _LoginPageState extends State<LoginPage> {
                                           filled: true,
                                           fillColor: Colors.white,
                                           hintText: 'Email',
-                                          prefixIcon: Icon(Icons.email),
+                                          prefixIcon: const Icon(Icons.email),
                                           border: OutlineInputBorder(
                                             borderRadius:
                                                 BorderRadius.circular(8.0),
                                           ),
                                         ),
                                       ),
-                                      SizedBox(height: 16.0),
+                                      SizedBox(height: 16.w),
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.end,
@@ -235,7 +236,7 @@ class _LoginPageState extends State<LoginPage> {
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: Text(
+                                            child: const Text(
                                               'Cancel',
                                               style: TextStyle(
                                                 color:
@@ -243,7 +244,7 @@ class _LoginPageState extends State<LoginPage> {
                                               ),
                                             ),
                                           ),
-                                          SizedBox(width: 8.0),
+                                          SizedBox(width: 8.w),
                                           ElevatedButton(
                                             onPressed: () async {
                                               // Validasi email
@@ -253,12 +254,12 @@ class _LoginPageState extends State<LoginPage> {
                                                   context: context,
                                                   builder: (context) =>
                                                       AlertDialog(
-                                                    title: Text('Error'),
-                                                    content: Text(
+                                                    title: const Text('Error'),
+                                                    content: const Text(
                                                         'Please enter your email'),
                                                     actions: [
                                                       TextButton(
-                                                        child: Text('OK'),
+                                                        child: const Text('OK'),
                                                         onPressed: () {
                                                           Navigator.pop(
                                                               context);
@@ -284,7 +285,7 @@ class _LoginPageState extends State<LoginPage> {
                                                       'http://103.29.214.154:9002/api_absensi/user/reset_password/'),
                                                   body: requestData,
                                                 );
-                                                print(response);
+                                               
                                                 // Memeriksa kode respons API
                                                 if (response.statusCode ==
                                                     200) {
@@ -293,12 +294,12 @@ class _LoginPageState extends State<LoginPage> {
                                                     context: context,
                                                     builder: (context) =>
                                                         AlertDialog(
-                                                      title: Text('Success'),
-                                                      content: Text(
+                                                      title: const Text('Success'),
+                                                      content: const Text(
                                                           'Password reset instructions sent to your email.'),
                                                       actions: [
                                                         TextButton(
-                                                          child: Text('OK'),
+                                                          child: const Text('OK'),
                                                           onPressed: () {
                                                             Navigator.pop(
                                                                 context);
@@ -313,12 +314,12 @@ class _LoginPageState extends State<LoginPage> {
                                                     context: context,
                                                     builder: (context) =>
                                                         AlertDialog(
-                                                      title: Text('Error'),
-                                                      content: Text(
+                                                      title: const Text('Error'),
+                                                      content: const Text(
                                                           'Failed to reset password. Please try again later.'),
                                                       actions: [
                                                         TextButton(
-                                                          child: Text('OK'),
+                                                          child: const Text('OK'),
                                                           onPressed: () {
                                                             Navigator.pop(
                                                                 context);
@@ -334,12 +335,12 @@ class _LoginPageState extends State<LoginPage> {
                                                   context: context,
                                                   builder: (context) =>
                                                       AlertDialog(
-                                                    title: Text('Error'),
-                                                    content: Text(
+                                                    title: const Text('Error'),
+                                                    content: const Text(
                                                         'An error occurred. Please try again later.'),
                                                     actions: [
                                                       TextButton(
-                                                        child: Text('OK'),
+                                                        child: const Text('OK'),
                                                         onPressed: () {
                                                           Navigator.pop(
                                                               context);
@@ -350,15 +351,15 @@ class _LoginPageState extends State<LoginPage> {
                                                 );
                                               }
                                             },
-                                            child: Text(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: const Color.fromARGB(
+                                                  255, 2, 65, 128),
+                                            ),
+                                            child: const Text(
                                               'Submit',
                                               style: TextStyle(
                                                 color: Colors.white,
                                               ),
-                                            ),
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Color.fromARGB(
-                                                  255, 2, 65, 128),
                                             ),
                                           ),
                                         ],
@@ -369,7 +370,7 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             );
                           },
-                          child: Text(
+                          child: const Text(
                             'Forgot Password?',
                             style: TextStyle(
                               fontSize: 16.0,

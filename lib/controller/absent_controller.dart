@@ -18,36 +18,32 @@ class AbsentController extends GetxController {
 
   retriveCoordinateUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var userId = prefs.getInt('user-id_user');
-    var userInfo = await employeeNetUtils.retrieveEmployeeInfo(userId);
-    double? savedLatitude = prefs.getDouble('user-position_lat');
-    double? savedLongitude = prefs.getDouble('user-position_long');
+    prefs.getInt('user-id_user');
+    prefs.getDouble('user-position_lat');
+    prefs.getDouble('user-position_long');
 
-    var imgProf = userInfo['details']['img_prof_url'];
-    var kantor = userInfo['details']['lokasi_group']['name'];
-    var shift = '08.00 -16.00';
   }
 
-  retriveTotalData(_selectedDate) async {
+  retriveTotalData(selectedDate) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     var userId = prefs.getInt('user-id_user');
     var token = prefs.getString('token');
 
     var date =
-        "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}";
+        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}";
 
     var totalData = await absentNetUtils.retriveTotalData(token, userId, date);
     return ResponseHelper().jsonResponse(totalData);
   }
 
-  retriveAbsentData(_selectedDate) async {
+  retriveAbsentData(selectedDate) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
 
     var userId = prefs.getInt('user-id_user');
     var token = prefs.getString('token');
     var date =
-        "${_selectedDate.year}-${_selectedDate.month.toString().padLeft(2, '0')}";
+        "${selectedDate.year}-${selectedDate.month.toString().padLeft(2, '0')}";
     var absentData =
         await absentNetUtils.retriveAbsentData(token, userId, date);
     var result = ResponseHelper().jsonResponse(absentData);
@@ -62,8 +58,7 @@ class AbsentController extends GetxController {
           DateTime? dateTimeMasuk;
           final String rawTimeMasuk = item['jam_absen'];
 
-          if (rawTimeMasuk != null &&
-              RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+          if (RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
                   .hasMatch(rawTimeMasuk)) {
             dateTimeMasuk = DateTime.parse(rawTimeMasuk).toLocal();
           }
@@ -77,8 +72,7 @@ class AbsentController extends GetxController {
           DateTime? dateTimeKeluar;
           final String rawTimeKeluar = item['jam_absen'];
 
-          if (rawTimeKeluar != null &&
-              RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+          if (RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
                   .hasMatch(rawTimeKeluar)) {
             dateTimeKeluar = DateTime.parse(rawTimeKeluar).toLocal();
           }
@@ -111,12 +105,8 @@ class AbsentController extends GetxController {
           'dateColor': tanggal.weekday == DateTime.sunday
               ? ColorsTheme.lightRed
               : ColorsTheme.black,
-          'id_masuk': data['clock_in'][0]['id_absen'] != null
-              ? data['clock_in'][0]['id_absen']
-              : null,
-          'id_keluar': data['clock_out'][0]['id_absen'] != null
-              ? data['clock_out'][0]['id_absen']
-              : null,
+          'id_masuk': data['clock_in'][0]['id_absen'],
+          'id_keluar': data['clock_out'][0]['id_absen'],
           'jamMasuk': clock_in,
           'jamKeluar': clock_out,
           'isSunday': tanggal.weekday == DateTime.sunday,

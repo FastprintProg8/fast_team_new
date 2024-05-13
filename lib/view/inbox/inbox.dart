@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
 
 void main() {
   runApp(MaterialApp(

@@ -11,6 +11,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class KameraPage extends StatefulWidget {
+  const KameraPage({super.key});
+
   @override
   KameraPageState createState() => KameraPageState();
 }
@@ -69,7 +71,7 @@ class KameraPageState extends State<KameraPage> {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             Navigator.pop(context);
           },
@@ -79,15 +81,15 @@ class KameraPageState extends State<KameraPage> {
           children: [
             Text(
               'Office: $kantor',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8), // Space between "Kantor" and "Masuk"
+            const SizedBox(height: 8), // Space between "Kantor" and "Masuk"
             Text(
               'Shift: $shift',
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 14,
               ),
             ),
@@ -100,20 +102,17 @@ class KameraPageState extends State<KameraPage> {
           children: <Widget>[
             Stack(
               children: [
-                Container(
-                  child: Transform.scale(
-                    scale: size.aspectRatio * 2.1,
-                    child: FutureBuilder<void>(
-                      future: _initializeControllerFuture,
-                      builder: (context, snapshot) {
-                        if (_controller != null &&
-                            snapshot.connectionState == ConnectionState.done) {
-                          return CameraPreview(_controller);
-                        } else {
-                          return Center(child: CircularProgressIndicator());
-                        }
-                      },
-                    ),
+                Transform.scale(
+                  scale: size.aspectRatio * 2.1,
+                  child: FutureBuilder<void>(
+                    future: _initializeControllerFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.done) {
+                        return CameraPreview(_controller);
+                      } else {
+                        return const Center(child: CircularProgressIndicator());
+                      }
+                    },
                   ),
                 ),
                 Positioned(
@@ -150,7 +149,7 @@ class KameraPageState extends State<KameraPage> {
                           width: double.infinity,
                           padding: EdgeInsets.symmetric(vertical: 16.h),
                           child: TextFormField(
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Note',
                               border: OutlineInputBorder(),
                             ),
@@ -164,10 +163,10 @@ class KameraPageState extends State<KameraPage> {
                         ElevatedButton(
                           onPressed: cekGambar,
                           style: ElevatedButton.styleFrom(
-                            minimumSize: Size(double.infinity,
+                            minimumSize: const Size(double.infinity,
                                 50), // Set the width to fill the screen
                           ),
-                          child: Text('Take Picture'),
+                          child: const Text('Take Picture'),
                         ),
                       ],
                     ),
@@ -185,7 +184,7 @@ class KameraPageState extends State<KameraPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
+        return const AlertDialog(
           content: Row(
             children: [
               CircularProgressIndicator(),
@@ -203,16 +202,18 @@ class KameraPageState extends State<KameraPage> {
       final File imageFile = File(image.path);
       // Kirim file gambar ke Django untuk perbandingan
       var resp = await kirimCekGambar(imageFile);
-      var resp_body = jsonDecode(resp);
-      Navigator.pop(context); // Tutup popup loading
-      if (resp_body['status'] == true) {
+      var respBody = jsonDecode(resp);
+      // ignore: use_build_context_synchronously
+      Navigator.pop(context); 
+      if (respBody['status'] == true) {
         // _controller.dispose();
         Navigator.pushReplacement(
+          // ignore: use_build_context_synchronously
           context,
           MaterialPageRoute(
             builder: (context) => ResultScreen(
               imageFile: imageFile,
-              resp: resp_body,
+              resp: respBody,
               aksi: aksi, // Kirim nilai aksi
               kantor: kantor, // Kirim nilai kantor
             ),
@@ -220,11 +221,12 @@ class KameraPageState extends State<KameraPage> {
         );
       } else {
         showDialog(
+          // ignore: use_build_context_synchronously
           context: context,
           builder: (context) {
             return AlertDialog(
-              title: Text('Error'),
-              content: Text('Your Face Not Detected, Who Are You?'),
+              title: const Text('Error'),
+              content: const Text('Your Face Not Detected, Who Are You?'),
               actions: [
                 ElevatedButton(
                   onPressed: () {
@@ -234,7 +236,7 @@ class KameraPageState extends State<KameraPage> {
                     backgroundColor: Theme.of(context)
                         .primaryColor, // Gunakan warna utama dari tema aplikasi Anda
                     minimumSize:
-                        Size(double.infinity, 50), // Atur lebar tombol ke penuh
+                        const Size(double.infinity, 50), // Atur lebar tombol ke penuh
                   ),
                   child: Text(
                     'OK',
@@ -247,6 +249,7 @@ class KameraPageState extends State<KameraPage> {
         );
       }
     } catch (e) {
+      // ignore: avoid_print
       print(e);
     }
   }
@@ -280,7 +283,7 @@ class KameraPageState extends State<KameraPage> {
       'id_user': idUser.toString(),
       'aksi': aksi,
       'base_64': await imageToBase64(imageFile),
-      'note': note ?? '',
+      'note': note,
     });
     request.headers.addAll({
     HttpHeaders.authorizationHeader: 'Bearer $token',
@@ -301,7 +304,7 @@ class ResultScreen extends StatelessWidget {
   final String aksi;
   final String kantor;
 
-  ResultScreen({
+  const ResultScreen({super.key, 
     required this.imageFile,
     required this.resp,
     required this.aksi,
@@ -327,6 +330,7 @@ class ResultScreen extends StatelessWidget {
       imageAsset = 'assets/img/centangSukses.png';
     }
 
+    // ignore: deprecated_member_use
     return WillPopScope(
       onWillPop: () async {
         Navigator.pushNamed(context, '/navigation');
@@ -369,7 +373,7 @@ class ResultScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 40),
+                SizedBox(height: 40.w),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
@@ -416,7 +420,7 @@ class ResultScreen extends StatelessWidget {
                     color: timeColor, // Ganti warna teks currentTime
                   ),
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 16.w),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 10.w),
                   child: Column(
@@ -426,12 +430,12 @@ class ResultScreen extends StatelessWidget {
                           Navigator.pushReplacementNamed(context, '/navigation');
                         },
                         style: ElevatedButton.styleFrom(
-                          minimumSize: Size(double.infinity, 50),
+                          minimumSize: const Size(double.infinity, 50),
                         ),
-                        child: Text('Back To Home'),
+                        child: const Text('Back To Home'),
                       ),
-                      SizedBox(height: 5),
-                      Container(
+                      SizedBox(height: 5.w),
+                      SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
@@ -440,12 +444,12 @@ class ResultScreen extends StatelessWidget {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.transparent,
                             elevation: 0,
-                            side: BorderSide(
+                            side: const BorderSide(
                               color: Colors.grey,
                               width: 1,
                             ),
                           ),
-                          child: Text(
+                          child: const Text(
                             'Show Log Attendance',
                             style: TextStyle(color: Colors.grey),
                           ),
@@ -455,7 +459,7 @@ class ResultScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  height: 16,
+                  height: 16.w,
                   width: double.infinity,
                 ),
               ],

@@ -1,13 +1,10 @@
 import 'package:Fast_Team/controller/home_controller.dart';
 import 'package:Fast_Team/style/color_theme.dart';
-import 'package:Fast_Team/widget/refresh_widget.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:table_calendar/table_calendar.dart';
 import 'package:flutter_calendar_carousel/flutter_calendar_carousel.dart'
     show CalendarCarousel;
 
@@ -40,17 +37,6 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
       dataMember = result;
     });
     // print(dataMember);
-  }
-
-  _onDaySelected(DateTime day, DateTime focusedDay) async {
-    setState(() {
-      selectedDate = day;
-    });
-
-    var result = await _fetchMemberData();
-    setState(() {
-      dataMember = result;
-    });
   }
 
   Future<List<dynamic>> _fetchMemberData() async {
@@ -94,7 +80,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
               (BuildContext context, AsyncSnapshot<List<dynamic>> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // Menampilkan indikator loading jika data masih dimuat
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               // Menampilkan pesan kesalahan jika ada kesalahan dalam memuat data
               return Text('Error: ${snapshot.error}');
@@ -174,7 +160,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
               ),
               ListView.builder(
                 shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
+                physics: const NeverScrollableScrollPhysics(),
                 itemCount: dataMember!.length,
                 itemBuilder: (context, index) {
                   final employee = dataMember![index];
@@ -182,7 +168,6 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                   final clockOut = !employee['jam_keluar'].isEmpty
                       ? employee['jam_keluar'].last['jam_absen']
                       : '00:00';
-                  print(clockOut);
                   final clockIn = !employee['jam_masuk'].isEmpty
                       ? employee['jam_masuk'][0]['jam_absen']
                       : '00:00';
@@ -238,7 +223,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                                         color: ColorsTheme.lightGreen,
                                       ),
                                       Text(
-                                        ' ${jamClockIn}',
+                                        ' $jamClockIn',
                                         style: TextStyle(
                                           fontSize: 15.sp,
                                           color: jamClockIn == '00:00'? ColorsTheme.lightRed : ColorsTheme.black,
@@ -255,7 +240,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                                         color: ColorsTheme.lightYellow,
                                       ),
                                       Text(
-                                        ' ${jamClockOut}',
+                                        ' $jamClockOut',
                                         style: TextStyle(
                                           fontSize: 15.sp,
                                           color: jamClockOut == '00:00'? ColorsTheme.lightRed : ColorsTheme.black,
@@ -301,7 +286,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                     height: 70.w,
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Color.fromARGB(255, 54, 165, 255),
+                      color: const Color.fromARGB(255, 54, 165, 255),
                       borderRadius: BorderRadius.only(
                           topLeft: Radius.circular(20.r),
                           topRight: Radius.circular(20.r)),
@@ -310,7 +295,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 6),
+                          offset: const Offset(0, 6),
                         ),
                       ],
                     ),
@@ -329,7 +314,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                           color: Colors.grey.withOpacity(0.5),
                           spreadRadius: 2,
                           blurRadius: 5,
-                          offset: Offset(0, 3),
+                          offset: const Offset(0, 3),
                         ),
                       ],
                     ),
@@ -342,7 +327,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                     padding: EdgeInsets.symmetric(horizontal: 5.w),
                     child: CalendarCarousel(
                       onDayPressed: (DateTime date, List events) async {
-                        this.setState(() => selectedDate = date);
+                        setState(() => selectedDate = date);
                         var result = await _fetchMemberData();
                         setState(() {
                           dataMember = result;
@@ -376,8 +361,8 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                       todayTextStyle: TextStyle(
                         color: ColorsTheme.white,
                       ),
-                      todayBorderColor: Color.fromARGB(255, 54, 165, 255),
-                      todayButtonColor: Color.fromARGB(255, 54, 165, 255),
+                      todayBorderColor: const Color.fromARGB(255, 54, 165, 255),
+                      todayButtonColor: const Color.fromARGB(255, 54, 165, 255),
                       selectedDayButtonColor: ColorsTheme.semiGreen!,
                       iconColor: ColorsTheme.white!,
                       thisMonthDayBorderColor: ColorsTheme.lightGrey!,
@@ -406,7 +391,7 @@ class _ListAbsentPageState extends State<ListAbsentPage> {
                           },
                           style: ElevatedButton.styleFrom(
                               backgroundColor:
-                                  Color.fromARGB(255, 54, 165, 255)),
+                                  const Color.fromARGB(255, 54, 165, 255)),
                           child: Text(
                             'Today',
                             style: TextStyle(color: ColorsTheme.white),

@@ -1,8 +1,11 @@
+// ignore_for_file: library_private_types_in_public_api
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:Fast_Team/utils/bottom_navigation_bar.dart';
 
 class SertificatePage extends StatefulWidget {
+  const SertificatePage({super.key});
+
   @override
   _SertificatePageState createState() => _SertificatePageState();
 }
@@ -38,7 +41,7 @@ class _SertificatePageState extends State<SertificatePage> {
             },
           )),
       body: sertificateList.isEmpty
-          ? Center(
+          ? const Center(
               child: CircularProgressIndicator(),
             )
           : ListView.builder(
@@ -54,21 +57,21 @@ class _SertificatePageState extends State<SertificatePage> {
 class CertificateCard extends StatelessWidget {
   final Sertificate sertificate;
 
-  CertificateCard({required this.sertificate});
+  const CertificateCard({super.key, required this.sertificate});
 
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(16.0),
+      margin: const EdgeInsets.all(16.0),
       elevation: 5,
-      child: Container(
+      child: SizedBox(
         height: 250,
         width: double.infinity,
         child: Stack(
           children: [
             Positioned.fill(
               child: ClipRRect(
-                borderRadius: BorderRadius.only(
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(8.0),
                   topRight: Radius.circular(8.0),
                 ),
@@ -100,10 +103,10 @@ class CertificateCard extends StatelessWidget {
               left: 0.0,
               right: 0.0,
               child: Container(
-                padding: EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(8.0),
                     bottomRight: Radius.circular(8.0),
                   ),
@@ -112,7 +115,7 @@ class CertificateCard extends StatelessWidget {
                       color: Colors.black.withOpacity(0.2),
                       spreadRadius: 2,
                       blurRadius: 5,
-                      offset: Offset(0, 3),
+                      offset: const Offset(0, 3),
                     ),
                   ],
                 ),
@@ -124,10 +127,10 @@ class CertificateCard extends StatelessWidget {
                       children: [
                         Text(
                           sertificate.title,
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 16.0),
                         ),
-                        SizedBox(height: 8.0),
+                        const SizedBox(height: 8.0),
                         Row(
                           children: [
                             Icon(
@@ -136,7 +139,7 @@ class CertificateCard extends StatelessWidget {
                                   ? Colors.grey
                                   : Colors.blue,
                             ),
-                            SizedBox(width: 8.0),
+                            const SizedBox(width: 8.0),
                             Text(
                               'Unduh Sertifikat',
                               style: TextStyle(
@@ -182,6 +185,6 @@ void main() {
     theme: ThemeData(
       primaryColor: Colors.blue,
     ),
-    home: SertificatePage(),
+    home: const SertificatePage(),
   ));
 }
