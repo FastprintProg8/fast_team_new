@@ -21,7 +21,7 @@ migrate_working_dir/
 # is commented out by default.
 #.vscode/
 # Ignore platform-specific directories
-/android/
+# /android/
 /ios/
 /linux/
 /windows/
@@ -49,6 +49,6 @@ app.*.symbols
 app.*.map.json
 
 # Android Studio will place build artifacts here
-/android/app/debug
-/android/app/profile
-/android/app/release
+# /android/app/debug
+# /android/app/profile
+# /android/app/release
