@@ -25,8 +25,10 @@ class ScheduleRequestController {
   }
 
   insertLeaveSubmission(Map<String, dynamic> bodyParams, file) async {
-    var result =
-        await scheduleRequestNetUtils.insertLeaveSubmission(bodyParams, file);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var token = prefs.getString('token');
+    var result = await scheduleRequestNetUtils.insertLeaveSubmission(
+        bodyParams, file, token);
 
     return result;
   }
@@ -34,8 +36,8 @@ class ScheduleRequestController {
   insertOvertimeSubmission(Map<String, dynamic> bodyParams) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
-    var result =
-        await scheduleRequestNetUtils.insertOvertimeSubmission(bodyParams,token);
+    var result = await scheduleRequestNetUtils.insertOvertimeSubmission(
+        bodyParams, token);
 
     return ResponseHelper().jsonResponse(result);
   }

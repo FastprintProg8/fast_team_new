@@ -48,13 +48,18 @@ class ScheduleRequestNetUtils {
     return response;
   }
 
-  insertLeaveSubmission(Map<String, dynamic> bodyParams, file) async {
+  insertLeaveSubmission(
+      Map<String, dynamic> bodyParams, file, var token) async {
+    Map<String, String> headers = {
+      'Authorization': 'Bearer $token',
+    };
     var response = http.MultipartRequest(
       'POST',
       Uri.parse("${BaseServer.serverUrl}/api_absensi/cuti/"),
     );
 
     response.headers['Content-Type'] = 'application/json';
+    response.headers['Authorization'] = 'Bearer $token';
     response.fields['user'] = bodyParams['userId'];
     response.fields['cuti_id'] = bodyParams['cuti_id'];
     response.fields['tanggal'] = bodyParams['tanggal'];
