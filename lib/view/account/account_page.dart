@@ -97,7 +97,7 @@ class _AccountPageState extends State<AccountPage> {
     Widget header() {
       return Container(
         width: ScreenUtil().screenWidth,
-        height: 205.h,
+        height: 205.w,
         decoration: BoxDecoration(
           color: ColorsTheme.primary,
           borderRadius: BorderRadius.only(
@@ -179,13 +179,14 @@ class _AccountPageState extends State<AccountPage> {
               );
             }),
             const Divider(),
-            menuItems(
-                'Payroll Info', Colors.green, Icons.monetization_on, () {Navigator.push(
+            menuItems('Payroll Info', Colors.green, Icons.monetization_on, () {
+              Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => const PayrollInfo(),
                 ),
-              );}),
+              );
+            }),
             const Divider(),
             menuItems('Change Password', Colors.orange, Icons.lock, () {
               Navigator.push(
