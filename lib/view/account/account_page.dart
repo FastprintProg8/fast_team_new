@@ -97,7 +97,7 @@ class _AccountPageState extends State<AccountPage> {
     Widget header() {
       return Container(
         width: ScreenUtil().screenWidth,
-        height: 205.w,
+        height: 225.h,
         decoration: BoxDecoration(
           color: ColorsTheme.primary,
           borderRadius: BorderRadius.only(
