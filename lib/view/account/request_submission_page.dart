@@ -237,7 +237,12 @@ class _RequestSubmissionPageState extends State<RequestSubmissionPage> {
             Colors.blue[800]!,
             ColorsTheme.white!,
             () {
-              print('Button pressed');
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: Text("Menu masih belum tersedia",
+                    style: alertErrorTextStyle),
+                backgroundColor: ColorsTheme.lightRed,
+                behavior: SnackBarBehavior.floating,
+              ));
             },
           ),
           floatingButton(
