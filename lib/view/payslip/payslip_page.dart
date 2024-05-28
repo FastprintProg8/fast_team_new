@@ -48,6 +48,7 @@ class _PayslipPageState extends State<PayslipPage> {
     super.initState();
     initConstructor();
     initData();
+    
   }
 
   Future refreshItem() async {
@@ -62,7 +63,7 @@ class _PayslipPageState extends State<PayslipPage> {
     nama = "".obs;
     posisi = "".obs;
     imgUrl = "".obs;
-    id_payroll = "".obs;
+    id_payroll = 0.obs;
     divisi = "".obs;
     setState(() {
       _fetchData = payrolData();
@@ -80,9 +81,7 @@ class _PayslipPageState extends State<PayslipPage> {
       posisi.value = accountModel.posisiPekerjaan;
       divisi.value = accountModel.divisi;
       imgUrl.value = accountModel.imgProfUrl;
-      
     });
-    
   }
 
   Future<void> payrolData() async {
@@ -93,15 +92,16 @@ class _PayslipPageState extends State<PayslipPage> {
         .retriveDetailPayroll(salaryResult['details']['id']);
     setState(() {
       id_payroll.value = salaryResult['details']['id'];
-      basic_salary = salaryResult['details']['basic_salary'];
-      net_salary = salaryResult['details']['take_home_pay'];
+      basic_salary = salaryResult['details']['basic_salary'].toDouble();
+      net_salary = salaryResult['details']['take_home_pay'].toDouble();
       detail_payroll = salaryDetail['details'];
       deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
       allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
     });
   }
 
-  double calculateTotalDeductionAmount(List<dynamic> detail_payroll, String type) {
+  double calculateTotalDeductionAmount(
+      List<dynamic> detail_payroll, String type) {
     double total = 0.0;
     for (var item in detail_payroll) {
       if (item['type'] == type) {
@@ -132,9 +132,8 @@ class _PayslipPageState extends State<PayslipPage> {
       if (date != null) {
         setState(() {
           _selectedDate = date;
-           _fetchData = payrolData();
+          _fetchData = payrolData();
         });
-        // await _loadDataForSelectedMonth();
       }
     });
   }
@@ -160,14 +159,15 @@ class _PayslipPageState extends State<PayslipPage> {
       return FutureBuilder(
           future: _fetchData,
           builder: (context, AsyncSnapshot snapshot) {
+            print(snapshot.error);
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return  _bodyContent(context, formattedDate,true);
+              return _bodyContent(context, formattedDate, true);
             } else if (snapshot.hasData) {
-              return _bodyContent(context, formattedDate,false);
+              return _bodyContent(context, formattedDate, false);
             } else {
-              return _bodyContent(context, formattedDate,false);
+              return _bodyContent(context, formattedDate, false);
             }
           });
     }
@@ -197,7 +197,8 @@ class _PayslipPageState extends State<PayslipPage> {
         ));
   }
 
-  Widget _bodyContent(BuildContext context, String formattedDate,bool isEmpty) {
+  Widget _bodyContent(
+      BuildContext context, String formattedDate, bool isEmpty) {
     return Column(
       children: [
         Container(
@@ -241,76 +242,77 @@ class _PayslipPageState extends State<PayslipPage> {
         ),
         _cardInfo(context),
         SizedBox(height: 20.h),
-        (!isEmpty)?
-        Expanded(
-          child: Container(
-            margin: EdgeInsets.symmetric(horizontal: 10.w),
-            child: ListView(
-              children: [
-                _salarySlipCard(context),
-                SizedBox(
-                  height: 10.w,
+        (!isEmpty)
+            ? Expanded(
+                child: Container(
+                  margin: EdgeInsets.symmetric(horizontal: 10.w),
+                  child: ListView(
+                    children: [
+                      _salarySlipCard(context),
+                      SizedBox(
+                        height: 10.w,
+                      ),
+                      ElevatedButton(
+                          onPressed: () {
+                            download().then((_) {
+                              print('Payslip is downloaded !');
+                            });
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue[900],
+                            splashFactory: InkSplash.splashFactory,
+                          ),
+                          child: const Text(
+                            'Download Salary Slip',
+                            style: TextStyle(color: Colors.white),
+                          ))
+                    ],
+                  ),
                 ),
-                ElevatedButton(
-                    onPressed: () {
-                      download().then((_) {
-                        print('Payslip is downloaded !');
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue[900],
-                      splashFactory: InkSplash.splashFactory,
-                     
-                    ),
-                    child: const Text(
-                      'Download Salary Slip',
-                      style: TextStyle(color: Colors.white),
-                    ))
-              ],
-            ),
-          ),
-        ): _noData()
+              )
+            : _noData()
       ],
     );
   }
+
   Widget _noData() {
     return Expanded(
       child: ListView(
-          children: <Widget>[
-            Center(
-              child: Container(
-                width: 200, // Adjust width as needed
-                height: 200, // Adjust height as needed
-                decoration: BoxDecoration(
-                  color: Colors.blue[100], // Adjust color as needed
-                  borderRadius: BorderRadius.circular(
-                      100), // Half the height for an oval shape
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.update,
-                    size: 100.0,
-                    color: Colors.blue,
-                  ),
+        children: <Widget>[
+          Center(
+            child: Container(
+              width: 200, // Adjust width as needed
+              height: 200, // Adjust height as needed
+              decoration: BoxDecoration(
+                color: Colors.blue[100], // Adjust color as needed
+                borderRadius: BorderRadius.circular(
+                    100), // Half the height for an oval shape
+              ),
+              child: const Center(
+                child: Icon(
+                  Icons.update,
+                  size: 100.0,
+                  color: Colors.blue,
                 ),
               ),
             ),
-            const SizedBox(
-              height: 16.0,
-            ),
-            const Center(
-              child: Text(
-                'There is no data',
-                style: TextStyle(
-                  fontSize: 18,
-                ),
+          ),
+          const SizedBox(
+            height: 16.0,
+          ),
+          const Center(
+            child: Text(
+              'There is no data',
+              style: TextStyle(
+                fontSize: 18,
               ),
-            )
-          ],
-        ),
-      
+            ),
+          )
+        ],
+      ),
     );
   }
+
   Widget _salarySlipCard(BuildContext context) {
     return Card(
       child: ExpansionTile(
@@ -390,7 +392,8 @@ class _PayslipPageState extends State<PayslipPage> {
                             ),
                           ),
                           if (detail_payroll.isEmpty) // Cek apakah data kosong
-                            const Text("") // Jika kosong, kembalikan Text kosong
+                            const Text(
+                                "") // Jika kosong, kembalikan Text kosong
                           else if (detail_payroll
                               .where((item) => item["type"] == "deduction")
                               .isEmpty)
@@ -434,7 +437,8 @@ class _PayslipPageState extends State<PayslipPage> {
                               const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                const Text("") // Jika kosong, kembalikan Text kosong
+                                const Text(
+                                    "") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "allowance")
                                   .isEmpty)
@@ -459,7 +463,8 @@ class _PayslipPageState extends State<PayslipPage> {
                               const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                const Text("") // Jika kosong, kembalikan Text kosong
+                                const Text(
+                                    "") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "deduction")
                                   .isEmpty)
@@ -495,7 +500,8 @@ class _PayslipPageState extends State<PayslipPage> {
                               const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                const Text("") // Jika kosong, kembalikan Text kosong
+                                const Text(
+                                    "") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "allowance")
                                   .isEmpty)
@@ -523,7 +529,8 @@ class _PayslipPageState extends State<PayslipPage> {
                               const Text(""),
                               if (detail_payroll
                                   .isEmpty) // Cek apakah data kosong
-                                const Text("") // Jika kosong, kembalikan Text kosong
+                                const Text(
+                                    "") // Jika kosong, kembalikan Text kosong
                               else if (detail_payroll
                                   .where((item) => item["type"] == "deduction")
                                   .isEmpty)
@@ -538,7 +545,7 @@ class _PayslipPageState extends State<PayslipPage> {
                                     .where(
                                         (item) => item["type"] == "deduction")
                                     .map((item) {
-                                  double amount = item["amount"];
+                                  double amount = item["amount"].toDouble();
                                   String formattedAmount =
                                       formatCurrency(amount);
                                   return Text(

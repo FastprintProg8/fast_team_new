@@ -10,14 +10,16 @@ class PayrollController {
     var userEmployeeId = prefs.getInt('user-employee_id');
     var token = prefs.getString('token');
     var result = await payrollNetUtils.requestPayroll(token,userEmployeeId, date);
+    
     return ResponseHelper().jsonResponse(result);
   }
 
   retriveDetailPayroll(payrollId)async{
-    print(payrollId);
+    
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var token = prefs.getString('token');
     var result = await payrollNetUtils.requestDetailPayroll(token,payrollId);
+    
     return  ResponseHelper().jsonResponse(result);
   }
 
