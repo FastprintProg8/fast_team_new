@@ -154,7 +154,7 @@ class _TabNotificationPageState extends State<TabNotificationPage>
             } else if (snapshot.hasError) {
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
-                  content: Text('Error: ${snapshot.error}',
+                  content: Text('No Internet Connection',
                       style: alertErrorTextStyle),
                   backgroundColor: ColorsTheme.lightRed,
                   behavior: SnackBarBehavior.floating,
@@ -175,7 +175,9 @@ class _TabNotificationPageState extends State<TabNotificationPage>
     return RefreshWidget(
       onRefresh: refreshItem,
       child: (!isLoading)
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(
+              child: CircularProgressIndicator(),
+            )
           : (notificationList.isNotEmpty)
               ? ListView(
                   children: [_notificationList()],
@@ -183,9 +185,10 @@ class _TabNotificationPageState extends State<TabNotificationPage>
               : ListView(
                   children: [
                     SizedBox(
-                        height: 0.5 * MediaQuery.of(context).size.height -
-                            MediaQuery.of(context).padding.top,
-                        child: _noNotifications()),
+                      height: 0.5 * MediaQuery.of(context).size.height -
+                          MediaQuery.of(context).padding.top,
+                      child: _noNotifications(),
+                    ),
                   ],
                 ),
     );

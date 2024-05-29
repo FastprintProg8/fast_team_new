@@ -50,9 +50,6 @@ class ScheduleRequestNetUtils {
 
   insertLeaveSubmission(
       Map<String, dynamic> bodyParams, file, var token) async {
-    Map<String, String> headers = {
-      'Authorization': 'Bearer $token',
-    };
     var response = http.MultipartRequest(
       'POST',
       Uri.parse("${BaseServer.serverUrl}/api_absensi/cuti/"),

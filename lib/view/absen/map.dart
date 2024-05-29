@@ -36,6 +36,7 @@ class _MapPageState extends State<MapPage> {
   late MapController _mapController;
   double _latitude = 0;
   double _longitude = 0;
+  bool gpsIsActive = true;
 
   @override
   void initState() {
@@ -79,21 +80,37 @@ class _MapPageState extends State<MapPage> {
   }
 
   Future<void> _getCurrentLocation() async {
-    Position position = await Geolocator.getCurrentPosition();
-    AbsentController absentController = Get.put(AbsentController());
-    double latitude = position.latitude;
-    double longitude = position.longitude;
+    bool isLocationServiceEnabled = await Geolocator.isLocationServiceEnabled();
 
-    await absentController.storeCoordinateUser(latitude, longitude);
+    if (isLocationServiceEnabled) {
+      Position position = await Geolocator.getCurrentPosition();
+      AbsentController absentController = Get.put(AbsentController());
+      double latitude = position.latitude;
+      double longitude = position.longitude;
 
-    setState(() {
-      _latitude = latitude;
-      _longitude = longitude;
-    });
+      await absentController.storeCoordinateUser(latitude, longitude);
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _mapController.move(LatLng(latitude, longitude), 18.0);
-    });
+      setState(() {
+        _latitude = latitude;
+        _longitude = longitude;
+         gpsIsActive = true;
+      });
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _mapController.move(LatLng(latitude, longitude), 18.0);
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('GPS Not Active'),
+          backgroundColor: Colors.red,
+        ),
+      );
+
+      setState(() {
+        gpsIsActive = false;
+      });
+    }
   }
 
   void _reloadMap() {
@@ -103,26 +120,47 @@ class _MapPageState extends State<MapPage> {
 
   // ignore: non_constant_identifier_names
   void cek_lokasi() {
-    final List<String> imgProfParts =
-        imgProf.split('/'); // Memecah string berdasarkan karakter "/"
-    final String imgProfLastPart = imgProfParts.isNotEmpty
-        ? imgProfParts.last
-        : ''; // Mengambil bagian terakhir, atau string kosong jika tidak ada bagian
-    Navigator.pushReplacementNamed(context, '/kamera', arguments: {
-      'idUser': idUser,
-      'long': _longitude,
-      'lat': _latitude,
-      'imgProf': imgProfLastPart, // Menggunakan bagian terakhir dari imgProf
-      'aksi': aksi,
-      'kantor': kantor,
-      'shift': shift,
-    });
+    if (gpsIsActive) {
+      final List<String> imgProfParts =
+          imgProf.split('/'); // Memecah string berdasarkan karakter "/"
+      final String imgProfLastPart = imgProfParts.isNotEmpty
+          ? imgProfParts.last
+          : ''; // Mengambil bagian terakhir, atau string kosong jika tidak ada bagian
+      Navigator.pushReplacementNamed(context, '/kamera', arguments: {
+        'idUser': idUser,
+        'long': _longitude,
+        'lat': _latitude,
+        'imgProf': imgProfLastPart, // Menggunakan bagian terakhir dari imgProf
+        'aksi': aksi,
+        'kantor': kantor,
+        'shift': shift,
+      });
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('GPS not acitve'),
+            content: Text(
+                'Unable to clock in, please activate navigation to absent. '),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     aksi = ModalRoute.of(context)!.settings.arguments as String;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(

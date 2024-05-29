@@ -172,13 +172,13 @@ class _PersonalInfoState extends State<PersonalInfo> {
             return contentBody(false);
           } else if (snapshot.hasError) {
             SchedulerBinding.instance.addPostFrameCallback((_) {
-              var snackbar = SnackBar(
-                content: Text('Error: ${snapshot.error}',
-                    style: alertErrorTextStyle),
-                backgroundColor: ColorsTheme.lightRed,
-                behavior: SnackBarBehavior.floating,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                var snackbar = SnackBar(
+                  content: Text('No Internet Connection',
+                      style: alertErrorTextStyle),
+                  backgroundColor: ColorsTheme.lightRed,
+                  behavior: SnackBarBehavior.floating,
+                );
+                ScaffoldMessenger.of(context).showSnackBar(snackbar);
             });
             return contentBody(false);
           } else if (snapshot.hasData) {

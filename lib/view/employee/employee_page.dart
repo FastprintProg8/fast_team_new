@@ -7,6 +7,7 @@ import 'package:Fast_Team/controller/employee_controller.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EmployeePage extends StatefulWidget {
@@ -27,6 +28,7 @@ class _EmployeePageState extends State<EmployeePage> {
   int startList = 0;
   int endList = 10;
   bool moreData = true;
+  bool hasInternet = false;
 
   Future? _fetchData;
 
@@ -40,19 +42,36 @@ class _EmployeePageState extends State<EmployeePage> {
   @override
   void initState() {
     super.initState();
-    employeeController = Get.put(EmployeeController());
+    checkInternetConnection();
+  }
 
-    listViewController.addListener(() {
-      if (listViewController.position.pixels ==
-          listViewController.position.maxScrollExtent) {
-        if (moreData) {
-          // print('test');
-          _addItems();
+  void checkInternetConnection() async {
+    bool result = await InternetConnection().hasInternetAccess;
+    if (result != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No Internet Connection'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      setState(() {
+        hasInternet = true;
+      });
+
+      employeeController = Get.put(EmployeeController());
+
+      listViewController.addListener(() {
+        if (listViewController.position.pixels ==
+            listViewController.position.maxScrollExtent) {
+          if (moreData) {
+            // print('test');
+            _addItems();
+          }
         }
-      }
-    });
-
-    initConstructor();
+      });
+      initConstructor();
+    }
   }
 
   initConstructor() async {
@@ -62,11 +81,15 @@ class _EmployeePageState extends State<EmployeePage> {
   }
 
   Future _refreshItem() async {
-    setState(() {
-      startList = 0;
-      endList = 10;
-      _fetchData = fetchData();
-    });
+    try {
+      setState(() {
+        startList = 0;
+        endList = 10;
+        _fetchData = fetchData();
+      });
+    } catch (e) {
+      checkInternetConnection();
+    }
   }
 
   Future _addItems() async {
@@ -118,16 +141,17 @@ class _EmployeePageState extends State<EmployeePage> {
       }).toList();
       moreData = true;
     });
-      if(filteredEmployees.length <= 6){
-        delayMoreData();
-      }
+    if (filteredEmployees.length <= 6) {
+      delayMoreData();
+    }
   }
+
   Future<void> delayMoreData() async {
-  await Future.delayed(const Duration(seconds: 3));
-  setState(() {
-    moreData = false;
-  });
-}
+    await Future.delayed(const Duration(seconds: 3));
+    setState(() {
+      moreData = false;
+    });
+  }
 
   _launchWhatsapp(phone) async {
     var whatsapp = phone;
@@ -187,18 +211,13 @@ class _EmployeePageState extends State<EmployeePage> {
                   future: _fetchData,
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
+                      return ListView(children: [
+                        Center(child: CircularProgressIndicator())
+                      ]);
                     } else if (snapshot.hasError) {
-                      SchedulerBinding.instance.addPostFrameCallback((_) {
-                        var snackbar = SnackBar(
-                          content: Text('Error: ${snapshot.error}',
-                              style: alertErrorTextStyle),
-                          backgroundColor: ColorsTheme.lightRed,
-                          behavior: SnackBarBehavior.floating,
-                        );
-                        ScaffoldMessenger.of(context).showSnackBar(snackbar);
-                      });
-                      return const Center(child: CircularProgressIndicator());
+                      return ListView(children: [
+                        Center(child: CircularProgressIndicator())
+                      ]);
                     } else if (snapshot.hasData) {
                       return _body();
                     } else {

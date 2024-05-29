@@ -12,6 +12,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -96,6 +97,7 @@ class _HomePageState extends State<HomePage> {
   List<dynamic> ListDataMember = [];
   List<dynamic> ListDataEmployee = [];
   List<dynamic> memberData = [];
+  bool hasInternet = false;
 
   HomeController? homeController;
   final listViewController = ScrollController();
@@ -104,29 +106,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-
-    listViewController.addListener(() {
-      if (listViewController.position.pixels ==
-          listViewController.position.maxScrollExtent) {
-        if (moreData) {
-          // print('test');
-          addItems();
-        }
-      }
-    });
-    initConstructor();
-    initData();
-    initializeState();
-
-    SystemChrome.setPreferredOrientations([
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown,
-    ]);
+    checkInternetConnection();
   }
-
-  // void _scrollListener() {
-  //   print('scrolled');
-  // }
 
   @override
   void dispose() {
@@ -136,6 +117,38 @@ class _HomePageState extends State<HomePage> {
       DeviceOrientation.portraitDown,
     ]);
     super.dispose();
+  }
+
+  void checkInternetConnection() async {
+    bool result = await InternetConnection().hasInternetAccess;
+    if (result != true) {
+     ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No Internet Connection'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      setState(() {
+        hasInternet = true;
+      });
+      listViewController.addListener(() {
+        if (listViewController.position.pixels ==
+            listViewController.position.maxScrollExtent) {
+          if (moreData) {
+            addItems();
+          }
+        }
+      });
+      initConstructor();
+      initData();
+      initializeState();
+
+      SystemChrome.setPreferredOrientations([
+        DeviceOrientation.portraitUp,
+        DeviceOrientation.portraitDown,
+      ]);
+    }
   }
 
   initConstructor() async {
@@ -200,6 +213,7 @@ class _HomePageState extends State<HomePage> {
     homeController = Get.put(HomeController());
     try {
       // Ambil data divisi
+      checkInternetConnection();
       var divisiData = await homeController!.listDivisi();
       ListDataEmployee = ListDataEmployee.sublist(0, 5);
 
@@ -215,7 +229,15 @@ class _HomePageState extends State<HomePage> {
         isLoading = true;
       });
     } catch (e) {
-      // ignore: avoid_print
+      bool result = await InternetConnection().hasInternetAccess;
+      if (result != true) {
+       ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No Internet Connection'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      }
       print(e);
     }
   }
@@ -256,19 +278,16 @@ class _HomePageState extends State<HomePage> {
           now.isBefore(keluarAkhirDateTime!);
     }
 
-    
-
     return result;
   }
 
   Future<void> loadData() async {
     homeController = Get.put(HomeController());
     try {
-     
       var divisiData = await homeController!.listDivisi();
       var fetch = await _fetchData();
       var resultMember = await _fetchMemberData();
-      
+
       setState(() {
         ListDataEmployee = fetch;
         divisiList = List.from(divisiData['details']);
@@ -309,7 +328,6 @@ class _HomePageState extends State<HomePage> {
 
         return listData;
       } else {
-       
         Map<String, dynamic> result = await homeController!
             .getListBelumAbsen(currentDate, int.parse(_selectedFilter));
         List<dynamic> listData = result['details']['data'];
@@ -318,7 +336,7 @@ class _HomePageState extends State<HomePage> {
         } else {
           listData = listData.sublist(0, listData.length);
         }
-        
+
         // setState(() {
         // ListDataEmployee = listData;
         // });
@@ -338,7 +356,6 @@ class _HomePageState extends State<HomePage> {
     List<dynamic> listData = result['details']['data'];
     return listData.length;
   }
-
 
   void _clockIn(BuildContext context) async {
     LocationPermission permission = await Geolocator.requestPermission();
@@ -525,8 +542,7 @@ class _HomePageState extends State<HomePage> {
             padding: const EdgeInsets.only(bottom: 12),
             decoration: const BoxDecoration(
               border: Border(
-                bottom:
-                    BorderSide(color: Color.fromARGB(255, 2, 65, 128)),
+                bottom: BorderSide(color: Color.fromARGB(255, 2, 65, 128)),
               ),
             ),
             child: Column(
@@ -534,7 +550,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Padding(
                   padding: EdgeInsets.all(8.w),
-                  child: (statusLoading)
+                  child: (statusLoading || !hasInternet)
                       ? loadingData(1)
                       : Text(
                           '$kantor ${getCurrentDay()}',
@@ -544,7 +560,7 @@ class _HomePageState extends State<HomePage> {
                 Padding(
                   padding: EdgeInsets.all(8.w),
                   child: Row(
-                    children: (statusLoading)
+                    children: (statusLoading || !hasInternet)
                         ? [loadingData(3)]
                         : [
                             Icon(
@@ -576,10 +592,10 @@ class _HomePageState extends State<HomePage> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                (statusLoading)
+                (statusLoading || !hasInternet)
                     ? absnetButtonLoading()
                     : absnetButton('Clock In', canAbsent(true), true),
-                (statusLoading)
+                (statusLoading || !hasInternet)
                     ? absnetButtonLoading()
                     : absnetButton('Clock Out', canAbsent(false), false),
               ],
@@ -622,7 +638,7 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: (!statusLoading)
+                        children: (!statusLoading || !hasInternet)
                             ? [
                                 loadingData(2),
                                 SizedBox(height: 5.h),
@@ -641,7 +657,7 @@ class _HomePageState extends State<HomePage> {
                       SizedBox(
                         width: 60.w,
                         height: 60.h,
-                        child: (!statusLoading)
+                        child: (!statusLoading || !hasInternet)
                             ? loadingAvatar()
                             : CachedNetworkImage(
                                 imageUrl: '$imgUrl',
@@ -1065,7 +1081,7 @@ class _HomePageState extends State<HomePage> {
                       arguments: idDivisi);
                 },
                 child: Container(
-                    child: (isLoading)
+                    child: (isLoading || !hasInternet)
                         ? Container(
                             height: 70.w,
                             decoration: BoxDecoration(
@@ -1091,7 +1107,7 @@ class _HomePageState extends State<HomePage> {
                                   color: Colors.grey.withOpacity(0.2),
                                   spreadRadius: 5,
                                   blurRadius: 7,
-                                  offset:const  Offset(
+                                  offset: const Offset(
                                       0, 3), // changes position of shadow
                                 ),
                               ],
@@ -1316,7 +1332,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   void onTabTapped(int index) {
-    setState(() {
-    });
+    setState(() {});
   }
 }

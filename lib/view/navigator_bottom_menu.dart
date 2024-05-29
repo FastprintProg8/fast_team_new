@@ -45,6 +45,7 @@ class _NavigatorBottomMenuState extends State<NavigatorBottomMenu> {
       exit(0);
     }
   }
+  
 
   @override
   Widget build(BuildContext context) {

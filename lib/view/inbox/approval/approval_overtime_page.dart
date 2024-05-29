@@ -184,7 +184,7 @@ class _ApprovalOvertimePageState extends State<ApprovalOvertimePage> {
             } else if (snapshot.hasError) {
               SchedulerBinding.instance.addPostFrameCallback((_) {
                 var snackbar = SnackBar(
-                  content: Text('Error: ${snapshot.error}',
+                  content: Text('No Internet Connection',
                       style: alertErrorTextStyle),
                   backgroundColor: ColorsTheme.lightRed,
                   behavior: SnackBarBehavior.floating,

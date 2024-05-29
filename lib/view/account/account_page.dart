@@ -14,6 +14,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -47,8 +48,25 @@ class _AccountPageState extends State<AccountPage> {
   @override
   void initState() {
     super.initState();
-    initConstructor();
-    initData();
+    checkInternetConnection();
+  }
+
+  void checkInternetConnection() async {
+    bool result = await InternetConnection().hasInternetAccess;
+    setState(() {
+      isLoading = true;
+    });
+    if (result != true) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('No Internet Connection'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    } else {
+      initConstructor();
+      initData();
+    }
   }
 
   initConstructor() {
@@ -74,22 +92,27 @@ class _AccountPageState extends State<AccountPage> {
   }
 
   Future refreshItem() async {
-    AccountController accountController = Get.put(AccountController());
-    var result = await accountController.retriveAccountInformation();
-    AccountInformationModel accountModel =
-        AccountInformationModel.fromJson(result['details']['data']);
+    try {
+      AccountController accountController = Get.put(AccountController());
+      checkInternetConnection();
+      var result = await accountController.retriveAccountInformation();
+      AccountInformationModel accountModel =
+          AccountInformationModel.fromJson(result['details']['data']);
 
-    setState(() {
-      fullNama = accountModel.fullName;
-      divisi = accountModel.divisi;
-      imgUrl = accountModel.imgProfUrl;
-      isLoading = true;
-    });
-    Future.delayed(const Duration(milliseconds: 500), () {
       setState(() {
-        isLoading = false;
+        fullNama = accountModel.fullName;
+        divisi = accountModel.divisi;
+        imgUrl = accountModel.imgProfUrl;
+        isLoading = true;
       });
-    });
+      Future.delayed(const Duration(milliseconds: 500), () {
+        setState(() {
+          isLoading = false;
+        });
+      });
+    } catch (e) {
+      checkInternetConnection();
+    }
   }
 
   @override
