@@ -31,6 +31,7 @@ class _PayslipPageState extends State<PayslipPage> {
   var deduction = 0.0;
   var allowance = 0.0;
   var detail_payroll = [];
+  bool emptyData = true;
   Future? _fetchData;
   bool isOpen = false;
   DateTime _selectedDate = DateTime.now();
@@ -48,7 +49,6 @@ class _PayslipPageState extends State<PayslipPage> {
     super.initState();
     initConstructor();
     initData();
-    
   }
 
   Future refreshItem() async {
@@ -88,16 +88,28 @@ class _PayslipPageState extends State<PayslipPage> {
     String formattedDate = formatDate(_selectedDate);
     PayrollController payrollController = Get.put(PayrollController());
     var salaryResult = await payrollController.retrivePayroll(formattedDate);
-    var salaryDetail = await payrollController
-        .retriveDetailPayroll(salaryResult['details']['id']);
-    setState(() {
-      id_payroll.value = salaryResult['details']['id'];
-      basic_salary = salaryResult['details']['basic_salary'].toDouble();
-      net_salary = salaryResult['details']['take_home_pay'].toDouble();
-      detail_payroll = salaryDetail['details'];
-      deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
-      allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
-    });
+    
+    if (salaryResult['status'] == 200) {
+      var salaryDetail = await payrollController
+          .retriveDetailPayroll(salaryResult['details']['id']);
+      setState(() {
+        id_payroll.value = salaryResult['details']['id'];
+        basic_salary = salaryResult['details']['basic_salary'].toDouble();
+        net_salary = salaryResult['details']['take_home_pay'].toDouble();
+        detail_payroll = salaryDetail['details'];
+        deduction = calculateTotalDeductionAmount(detail_payroll, 'deduction');
+        allowance = calculateTotalDeductionAmount(detail_payroll, 'allowance');
+        emptyData = false;
+      });
+    }else{
+      id_payroll = 0.obs;
+      basic_salary = 0.0;
+      net_salary = 0.0;
+      detail_payroll = [];
+      deduction = 0.0;
+      allowance = 0.0;
+      emptyData = true;
+    }
   }
 
   double calculateTotalDeductionAmount(
@@ -133,6 +145,7 @@ class _PayslipPageState extends State<PayslipPage> {
         setState(() {
           _selectedDate = date;
           _fetchData = payrolData();
+          showSalary = false;
         });
       }
     });
@@ -159,15 +172,14 @@ class _PayslipPageState extends State<PayslipPage> {
       return FutureBuilder(
           future: _fetchData,
           builder: (context, AsyncSnapshot snapshot) {
-            print(snapshot.error);
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
-              return _bodyContent(context, formattedDate, true);
+              return _bodyContent(context, formattedDate, emptyData);
             } else if (snapshot.hasData) {
-              return _bodyContent(context, formattedDate, false);
+              return _bodyContent(context, formattedDate, emptyData);
             } else {
-              return _bodyContent(context, formattedDate, false);
+              return _bodyContent(context, formattedDate, emptyData);
             }
           });
     }
@@ -443,7 +455,7 @@ class _PayslipPageState extends State<PayslipPage> {
                                   .where((item) => item["type"] == "allowance")
                                   .isEmpty)
                                 const Text(
-                                  "-",
+                                  "",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -469,7 +481,7 @@ class _PayslipPageState extends State<PayslipPage> {
                                   .where((item) => item["type"] == "deduction")
                                   .isEmpty)
                                 const Text(
-                                  "-",
+                                  "",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                   ),

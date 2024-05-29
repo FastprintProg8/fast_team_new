@@ -28,7 +28,7 @@ class _MilestonePageState extends State<MilestonePage> {
 
   initData() async {
     milestoneController = Get.put(MilestoneController());
-    var result = await milestoneController!.retrieveJobHistory(1);
+    var result = await milestoneController!.retrieveJobHistory();
 
     setState(() {
       arrayData = result['details'];
