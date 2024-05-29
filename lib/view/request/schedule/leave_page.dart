@@ -149,18 +149,18 @@ class _LeavePageState extends State<LeavePage>
       String formattedDate = DateFormat('yyyy-MM-dd').format(selectedDate);
       String formattedTime = selectedTime.format(context);
 
-      // RegExp regExp = RegExp(r'^\d{1,2}:\d{2}:\d{2}.\d{6}Z$');
-      // if (!regExp.hasMatch(formattedTime)) {
-      //   // Jika format bukan "HH:mm:ss.SSSSSS'Z'", maka ubah formatnya
-      //   String hour = selectedTime.hour.toString().padLeft(2, '0');
-      //   String minute = selectedTime.minute.toString().padLeft(2, '0');
-      //   String second =
-      //       '00'; // Karena tidak ada informasi detik dalam objek TimeOfDay
-      //   String microsecond =
-      //       '000000'; // Karena tidak ada informasi mikrodetik dalam objek TimeOfDay
+      // // RegExp regExp = RegExp(r'^\d{1,2}:\d{2}:\d{2}.\d{6}Z$');
+      // // if (!regExp.hasMatch(formattedTime)) {
+      // //   // Jika format bukan "HH:mm:ss.SSSSSS'Z'", maka ubah formatnya
+      // //   String hour = selectedTime.hour.toString().padLeft(2, '0');
+      // //   String minute = selectedTime.minute.toString().padLeft(2, '0');
+      // //   String second =
+      // //       '00'; // Karena tidak ada informasi detik dalam objek TimeOfDay
+      // //   String microsecond =
+      // //       '000000'; // Karena tidak ada informasi mikrodetik dalam objek TimeOfDay
 
-      //   formattedTime = '$hour:$minute:$second.$microsecond' + 'Z';
-      // }
+      // //   formattedTime = '$hour:$minute:$second.$microsecond' + 'Z';
+      // // }
       
       // Ambil cuti_id dari dropdown agenda yang dipilih
       String? selectedCutiId = leaveOptionsList
