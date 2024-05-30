@@ -18,6 +18,7 @@ class MilestonePage extends StatefulWidget {
 class _MilestonePageState extends State<MilestonePage> {
   MilestoneController? milestoneController;
   List<dynamic> arrayData = [];
+  bool isLoading = true;
 
   @override
   void initState() {
@@ -27,10 +28,11 @@ class _MilestonePageState extends State<MilestonePage> {
 
   initData() async {
     milestoneController = Get.put(MilestoneController());
-    var result = await milestoneController!.retrieveJobHistory(1);
-    // print(result);
+    var result = await milestoneController!.retrieveJobHistory();
+
     setState(() {
       arrayData = result['details'];
+      isLoading = false;
     });
   }
 
@@ -38,7 +40,6 @@ class _MilestonePageState extends State<MilestonePage> {
   int currentIndex = 0;
   @override
   Widget build(BuildContext context) {
-
     Theme.of(context);
     return Scaffold(
       appBar: AppBar(
@@ -61,43 +62,49 @@ class _MilestonePageState extends State<MilestonePage> {
           )),
       body: Padding(
         padding: EdgeInsets.symmetric(horizontal: 0.w),
-        child: arrayData.isEmpty
-            ? _noNotifications()
-            : ListView.builder(
-                shrinkWrap: true,
-                // physics: NeverScrollableScrollPhysics(),
-                itemCount: arrayData.length,
-                itemBuilder: (context, index) {
-                  DateTime dateTime =
-                      DateTime.parse(arrayData[index]['start_date'].toString());
-                  DateFormat formatter = DateFormat('dd MMMM yyyy');
-                  String formattedMonthYear = formatter.format(dateTime);
-                  Color color = colors[index % colors.length];
-                  return Column(
-                    children: [
-                      (index % 2 == 0)
-                          ? _leftMilestone(
-                              (index == arrayData.length - 1) ? true : false,
-                              (index == 0) ? true : false,
-                              formattedMonthYear,
-                              arrayData[index]['pegawai']['nama_lengkap'],
-                              arrayData[index]['title'],
-                              arrayData[index]['job_level']['name'],
-                              arrayData[index]['position']['name'],
-                              arrayData[index]['salary'],
-                              color)
-                          : _rightMilestone(
-                              (index == arrayData.length) ? true : false,
-                              formattedMonthYear,
-                              arrayData[index]['pegawai']['nama_lengkap'],
-                              arrayData[index]['title'],
-                              arrayData[index]['job_level']['name'],
-                              arrayData[index]['position']['name'],
-                              arrayData[index]['salary'],
-                              color),
-                    ],
-                  );
-                }),
+        child: isLoading
+            ? Center(
+                child: CircularProgressIndicator(),
+              )
+            : arrayData.isEmpty
+                ? _noNotifications()
+                : ListView.builder(
+                    shrinkWrap: true,
+                    // physics: NeverScrollableScrollPhysics(),
+                    itemCount: 5,
+                    itemBuilder: (context, index) {
+                      DateTime dateTime = DateTime.parse(
+                          arrayData[index]['start_date'].toString());
+                      DateFormat formatter = DateFormat('dd MMMM yyyy');
+                      String formattedMonthYear = formatter.format(dateTime);
+                      Color color = colors[index % colors.length];
+                      return Column(
+                        children: [
+                          (index % 2 == 0)
+                              ? _leftMilestone(
+                                  (index == arrayData.length - 1)
+                                      ? true
+                                      : false,
+                                  (index == 0) ? true : false,
+                                  formattedMonthYear,
+                                  arrayData[index]['pegawai']['nama_lengkap'],
+                                  arrayData[index]['title'],
+                                  arrayData[index]['job_level']['name'],
+                                  arrayData[index]['position']['name'],
+                                  arrayData[index]['salary'],
+                                  color)
+                              : _rightMilestone(
+                                  (index == arrayData.length) ? true : false,
+                                  formattedMonthYear,
+                                  arrayData[index]['pegawai']['nama_lengkap'],
+                                  arrayData[index]['title'],
+                                  arrayData[index]['job_level']['name'],
+                                  arrayData[index]['position']['name'],
+                                  arrayData[index]['salary'],
+                                  color),
+                        ],
+                      );
+                    }),
       ),
       bottomNavigationBar: bottomNavBar(context: context),
     );
@@ -144,11 +151,11 @@ class _MilestonePageState extends State<MilestonePage> {
                       ),
                       SizedBox(height: 5.w),
                       Text(
-                        name,
+                        name != null ? name : '',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        title ?? 'null',
+                        title ?? 'Judul Tidak Ada',
                       ),
                       SizedBox(
                         height: 10.w,
@@ -241,11 +248,11 @@ class _MilestonePageState extends State<MilestonePage> {
                       ),
                       SizedBox(height: 5.w),
                       Text(
-                        name,
+                        name != null ? name : '',
                         style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        title ?? 'null',
+                        title ?? 'Judul Tidak Ada',
                       ),
                       SizedBox(
                         height: 10.w,
