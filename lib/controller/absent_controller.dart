@@ -47,25 +47,28 @@ class AbsentController extends GetxController {
     var absentData =
         await absentNetUtils.retriveAbsentData(token, userId, date);
     var result = ResponseHelper().jsonResponse(absentData);
+    
     if (result['status'] == 200) {
       final List<dynamic> jsonData = result['details'];
       return jsonData.map((data) {
         List<dynamic> clock_in = data['clock_in'];
         List<dynamic> clock_out = data['clock_out'];
-        // print(clock_out);
+        
 
         clock_in.asMap().forEach((index, item) {
           DateTime? dateTimeMasuk;
           final String rawTimeMasuk = item['jam_absen'];
-
           if (RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+                  .hasMatch(rawTimeMasuk) || RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\Z$')
                   .hasMatch(rawTimeMasuk)) {
             dateTimeMasuk = DateTime.parse(rawTimeMasuk).toLocal();
           }
+          print(dateTimeMasuk);
           final String jamMasuk = dateTimeMasuk != null
               ? DateFormat.Hm().format(dateTimeMasuk)
               : '--:--';
           clock_in[index]['jam_absen'] = jamMasuk;
+          
         });
 
         clock_out.asMap().forEach((index, item) {
@@ -73,6 +76,7 @@ class AbsentController extends GetxController {
           final String rawTimeKeluar = item['jam_absen'];
 
           if (RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$')
+                  .hasMatch(rawTimeKeluar) || RegExp(r'^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\Z$')
                   .hasMatch(rawTimeKeluar)) {
             dateTimeKeluar = DateTime.parse(rawTimeKeluar).toLocal();
           }

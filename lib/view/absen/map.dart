@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_typing_uninitialized_variables, deprecated_member_use
+// ignore_for_file: prefer_typing_uninitialized_variables, deprecated_member_use, use_build_context_synchronously
 
 import 'package:Fast_Team/controller/absent_controller.dart';
 import 'package:Fast_Team/controller/account_controller.dart';
@@ -37,6 +37,7 @@ class _MapPageState extends State<MapPage> {
   double _latitude = 0;
   double _longitude = 0;
   bool gpsIsActive = true;
+  bool isMockedGps = false;
 
   @override
   void initState() {
@@ -84,6 +85,7 @@ class _MapPageState extends State<MapPage> {
 
     if (isLocationServiceEnabled) {
       Position position = await Geolocator.getCurrentPosition();
+
       AbsentController absentController = Get.put(AbsentController());
       double latitude = position.latitude;
       double longitude = position.longitude;
@@ -93,8 +95,19 @@ class _MapPageState extends State<MapPage> {
       setState(() {
         _latitude = latitude;
         _longitude = longitude;
-         gpsIsActive = true;
+        gpsIsActive = true;
+        isMockedGps = position.isMocked;
       });
+
+      if (isMockedGps) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+                'You in mode developer. Please turn off your mode developer and click refresh button to absent.'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _mapController.move(LatLng(latitude, longitude), 18.0);
@@ -102,7 +115,8 @@ class _MapPageState extends State<MapPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('GPS Not Active'),
+          content: Text(
+              'GPS Not Active!, Please turn on your gps and click refresh button.'),
           backgroundColor: Colors.red,
         ),
       );
@@ -120,7 +134,7 @@ class _MapPageState extends State<MapPage> {
 
   // ignore: non_constant_identifier_names
   void cek_lokasi() {
-    if (gpsIsActive) {
+    if (gpsIsActive && !isMockedGps) {
       final List<String> imgProfParts =
           imgProf.split('/'); // Memecah string berdasarkan karakter "/"
       final String imgProfLastPart = imgProfParts.isNotEmpty
@@ -135,20 +149,40 @@ class _MapPageState extends State<MapPage> {
         'kantor': kantor,
         'shift': shift,
       });
-    } else {
+    } else if (isMockedGps) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('GPS not acitve'),
-            content: Text(
-                'Unable to clock in, please activate navigation to absent. '),
+            title: const Text('Warning'),
+            content: const Text(
+                'You are in developer mode, please turn off developer mode to continue absent.'),
             actions: <Widget>[
               TextButton(
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
-                child: Text('close'),
+                child: const Text('close'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+     else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('GPS not active'),
+            content: const Text(
+                'Unable to clock in, please activate navigation and click refresh button to continue absent. '),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('close'),
               ),
             ],
           );
@@ -160,7 +194,6 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     aksi = ModalRoute.of(context)!.settings.arguments as String;
-
     return Scaffold(
       appBar: AppBar(
         title: Text(
