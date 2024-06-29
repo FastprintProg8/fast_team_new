@@ -428,12 +428,19 @@ class _HomePageState extends State<HomePage> {
       Map<String, dynamic> result =
           await homeController!.getListBelumAbsen('', 0);
       List<dynamic> listData = result['details']['data'];
-
-      if ((ListDataEmployee.length + 5) < listData.length) {
-        listData = listData.sublist(startList, endList);
-      } else {
-        listData = listData.sublist(startList, listData.length);
-      }
+      
+      // ListDataEmployee.addAll(listData);
+      // if ((ListDataEmployee.length + 5) < listData.length) {
+      //   listData = listData.sublist(startList, endList);
+      // } else {
+      //   if(listData.length <= 0){
+      //     setState(() {
+      //       moreData = true;
+      //     });
+      //   }else{
+      //     listData = listData.sublist(startList, listData.length);
+      //   }
+      // }
       setState(() {
         if (listData.length < 5) {
           moreData = false;

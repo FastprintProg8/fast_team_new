@@ -199,6 +199,7 @@ class _EmployeePageState extends State<EmployeePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Employees'),
       ),
       body: Column(
@@ -303,10 +304,10 @@ class _EmployeePageState extends State<EmployeePage> {
             ],
           ),
         ),
-        // Divider(
-        //   thickness: 1,
-        //   color: Colors.grey,
-        // ),
+        Divider(
+          thickness: 1,
+          color: Colors.grey,
+        ),
       ],
     );
   }

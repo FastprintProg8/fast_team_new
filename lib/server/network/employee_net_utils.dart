@@ -27,7 +27,7 @@ class EmployeeNetUtils {
       'Authorization': 'Bearer $token',
     };
     var response = await http
-        .get(Uri.parse("${BaseServer.serverUrl}/api_absensi/user-absen/"),
+        .get(Uri.parse("${BaseServer.serverUrl}/api_absensi/user-absen/?all=1"),
             headers: headers)
         .timeout(BaseServer.durationlimit);
 
