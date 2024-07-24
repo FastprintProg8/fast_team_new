@@ -135,9 +135,9 @@ class _HomePageState extends State<HomePage> {
       listViewController.addListener(() {
         if (listViewController.position.pixels ==
             listViewController.position.maxScrollExtent) {
-          if (moreData) {
-            addItems();
-          }
+          // if (moreData) {
+          //   addItems();
+          // }
         }
       });
       initConstructor();
@@ -187,6 +187,16 @@ class _HomePageState extends State<HomePage> {
   Future<void> initData() async {
     AccountController accountController = Get.put(AccountController());
     var result = await accountController.retriveAccountInformation();
+    print(result);
+    if(result['status'] == 500){
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Terjadi gangguan ketika mengambil data. Silahkan menghubungi Administrator untuk lebih lanjut."),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
     AccountInformationModel accountModel =
         AccountInformationModel.fromJson(result['details']['data']);
     idUser = accountModel.id;
@@ -215,7 +225,7 @@ class _HomePageState extends State<HomePage> {
       // Ambil data divisi
       checkInternetConnection();
       var divisiData = await homeController!.listDivisi();
-      ListDataEmployee = ListDataEmployee.sublist(0, 5);
+      // ListDataEmployee = ListDataEmployee.sublist(0, 5);
 
       setState(() {
         _loadData = loadData();
@@ -246,22 +256,22 @@ class _HomePageState extends State<HomePage> {
     tz.initializeTimeZones();
     final indonesia = tz.getLocation("Asia/Jakarta");
     now = tz.TZDateTime.now(indonesia);
-    if (masukAwal != null) {
+    if (masukAwal != '') {
       masukAwalDateTime =
           tz.TZDateTime.parse(indonesia, "$currentDate $masukAwal");
     }
 
-    if (masukAkhir != null) {
+    if (masukAkhir != '') {
       masukAkhirDateTime =
           tz.TZDateTime.parse(indonesia, "$currentDate $masukAkhir");
     }
 
-    if (keluarAwal != null) {
+    if (keluarAwal != '') {
       keluarAwalDateTime =
           tz.TZDateTime.parse(indonesia, "$currentDate $keluarAwal");
     }
 
-    if (keluarAkhir != null) {
+    if (keluarAkhir != '') {
       keluarAkhirDateTime =
           tz.TZDateTime.parse(indonesia, "$currentDate $keluarAkhir");
     }
@@ -291,7 +301,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         ListDataEmployee = fetch;
         divisiList = List.from(divisiData['details']);
-        moreData = true;
+        moreData = false;
       });
       setState(() {
         isLoading = false;
@@ -323,7 +333,7 @@ class _HomePageState extends State<HomePage> {
         // if (listData.length > 5) {
         //   listData = listData.sublist(startList, endList);
         // } else {
-        listData = listData.sublist(0, 5);
+        // listData = listData.sublist(0, 5);
         // }
 
         return listData;
@@ -331,11 +341,11 @@ class _HomePageState extends State<HomePage> {
         Map<String, dynamic> result = await homeController!
             .getListBelumAbsen(currentDate, int.parse(_selectedFilter));
         List<dynamic> listData = result['details']['data'];
-        if (listData.length > 5) {
-          listData = listData.sublist(0, 5);
-        } else {
-          listData = listData.sublist(0, listData.length);
-        }
+        // if (listData.length > 5) {
+        //   listData = listData.sublist(0, 5);
+        // } else {
+        //   listData = listData.sublist(0, listData.length);
+        // }
 
         // setState(() {
         // ListDataEmployee = listData;
@@ -442,9 +452,9 @@ class _HomePageState extends State<HomePage> {
       //   }
       // }
       setState(() {
-        if (listData.length < 5) {
-          moreData = false;
-        }
+        // if (listData.length < 5) {
+        //   moreData = false;
+        // }
         ListDataEmployee.addAll(listData);
       });
     } else {
@@ -453,16 +463,16 @@ class _HomePageState extends State<HomePage> {
       List<dynamic> listData = result['details']['data'];
 
       if (startList > listData.length) {
-        setState(() {
-          moreData = false;
-        });
+        // setState(() {
+        //   moreData = false;
+        // });
       } else {
-        if ((ListDataEmployee.length + 5) < listData.length) {
-          listData = listData.sublist(startList, endList);
-        } else {
-          // listData = listData.sublist(startList, endList);
-          listData = listData.sublist(startList, listData.length);
-        }
+        // if ((ListDataEmployee.length + 5) < listData.length) {
+        //   listData = listData.sublist(startList, endList);
+        // } else {
+        //   // listData = listData.sublist(startList, endList);
+        //   listData = listData.sublist(startList, listData.length);
+        // }
         setState(() {
           ListDataEmployee.addAll(listData);
         });
