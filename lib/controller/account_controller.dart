@@ -26,28 +26,29 @@ class AccountController extends GetxController {
 
   retriveAccountInformation() async {
     try {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    var userEmployeeId = prefs.getInt('user-employee_id');
-    
-    if (userEmployeeId == null) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var userEmployeeId = prefs.getInt('user-employee_id');
+
+      if (userEmployeeId == null) {
+        return {
+          "status": 400,
+          "details": "Employee ID not found in preferences."
+        };
+      }
+
+      var result = await employeeNetUtils.retrieveEmployeeInfo(userEmployeeId);
+      return ResponseHelper().jsonResponse(result);
+    } catch (e) {
       return {
-        "status": 400,
-        "details": "Employee ID not found in preferences."
+        "status": 500,
+        "details":
+            "Terjadi gangguan ketika mengambil data. Silahkan menghubungi Administrator untuk lebih lanjut."
       };
     }
-
-    var result = await employeeNetUtils.retrieveEmployeeInfo(userEmployeeId);
-    return ResponseHelper().jsonResponse(result);
-  } catch (e) {
-    return {
-      "status": 500,
-      "details": "Terjadi gangguan ketika mengambil data. Silahkan menghubungi Administrator untuk lebih lanjut."
-    };
-  }
   }
 
-  retrieveEmployeeBank() async{
-    var result = await employeeNetUtils.retrieveEmployeeBank() ;
+  retrieveEmployeeBank() async {
+    var result = await employeeNetUtils.retrieveEmployeeBank();
     return ResponseHelper().jsonResponse(result);
   }
 }
